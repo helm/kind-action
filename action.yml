@@ -1,22 +1,24 @@
-name: "kind (Kubernetes in Docker) cction"
+name: "kind (Kubernetes in Docker) action"
 description: "Create a kind cluster"
 author: "unguiculus"
 inputs:
   version:
     description: "The kind version to use (default: v0.5.1)"
-  configFile:
+  config:
     description: "The path to the kind config file"
-  nodeImage:
+  node-image:
     description: "The Docker image for the cluster nodes"
   name:
     description: "The name of the cluster to create (default: chart-testing)"
   wait:
     description: "The duration to wait for the control plane to become ready (default: 60s)"
-  loglevel:
-    description: "The loglevel for kind"
-outputs:
-  kubeConfigPath:
-    description: "The path to the kube config file"
+  log-level:
+    description: "The log level for kind"
+  install-local-path-provisioner:
+    description: |
+      If true, Rancher's local-path provisioner is installed which supports
+      dynamic volume provisioning on multi-node clusters. The newly created
+      local-path StorageClass is made the default.
 runs:
   using: "node12"
   main: "lib/main.js"

@@ -1,22 +1,12 @@
 {
-  "name": "typescript-action",
+  "name": "kind",
   "version": "0.0.0",
-  "private": true,
-  "description": "TypeScript template action",
+  "description": "kind GitHub action",
   "main": "lib/main.js",
   "scripts": {
     "build": "tsc"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/actions/typescript-action.git"
-  },
-  "keywords": [
-    "actions",
-    "node",
-    "setup"
-  ],
-  "author": "YourNameOrOrganization",
+  "author": "The Helm Authors",
   "license": "Apache",
   "dependencies": {
     "@actions/core": "^1.0.0",
