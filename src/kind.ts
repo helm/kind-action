@@ -5,12 +5,19 @@ import * as io from '@actions/io';
 import * as path from 'path';
 
 const defaultKindVersion = "v0.5.1";
+const defaultClusterName = "chart-testing";
 
 export class Kind {
     constructor(readonly version: string, readonly configFile: string, readonly nodeImage: string,
                 readonly clusterName: string, readonly waitDuration: string, readonly logLevel: string) {
         if (version === "") {
             this.version = defaultKindVersion;
+        }
+        if (waitDuration === "") {
+            this.waitDuration = "60s"
+        }
+        if (clusterName === "") {
+            this.clusterName = defaultClusterName
         }
     }
 
@@ -51,7 +58,7 @@ export class Kind {
         if (this.logLevel !== "") {
             args.push("--loglevel", this.logLevel)
         }
-        console.log("kind command-line: kind " + args.join(" "));
+        console.log("running process: kind " + args.join(" "));
 
         await exec.exec("kind", args);
     }
@@ -70,7 +77,7 @@ export class Kind {
         };
 
         const args = ["get", "kubeconfig-path", "--name", this.clusterName];
-        console.log("kind command-line: kind " + args.join(" "));
+        console.log("running process: kind " + args.join(" "));
 
         await exec.exec("kind", args, options);
         return output

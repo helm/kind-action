@@ -3,7 +3,7 @@ import {Kind} from './kind';
 
 const VersionInput = "version";
 const NodeImageInput = "nodeImage";
-const ConfigfileInput = "configFile";
+const ConfigFileInput = "configFile";
 const ClusterNameInput = "clusterName";
 const WaitDurationInput = "waitDuration";
 const LogLevelInput = "logLevel";
@@ -12,7 +12,7 @@ const KubeConfigPathOutput = "kubeConfigPath";
 
 export function createKind(): Kind {
     const version: string = core.getInput(VersionInput);
-    const configFile: string = core.getInput(ConfigfileInput);
+    const configFile: string = core.getInput(ConfigFileInput);
     const nodeImage: string = core.getInput(NodeImageInput);
     const clusterName: string = core.getInput(ClusterNameInput);
     const waitDuration: string = core.getInput(WaitDurationInput);

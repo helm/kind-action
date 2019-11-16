@@ -1,17 +1,17 @@
-name: "kind (Kubernetes in Docker) Action"
+name: "kind (Kubernetes in Docker) cction"
 description: "Create a kind cluster"
 author: "unguiculus"
 inputs:
   version:
     description: "The kind version to use (default: v0.5.1)"
   configFile:
-    description: "The path the the kind config file (must be relative to the repo root)"
+    description: "The path to the kind config file"
   nodeImage:
     description: "The Docker image for the cluster nodes"
   name:
-    description: "The name of the cluster to create"
+    description: "The name of the cluster to create (default: chart-testing)"
   wait:
-    description: "The duration to wait for the control plane to become ready"
+    description: "The duration to wait for the control plane to become ready (default: 60s)"
   loglevel:
     description: "The loglevel for kind"
 outputs:
