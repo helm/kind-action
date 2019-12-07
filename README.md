@@ -48,4 +48,4 @@ This uses [`@helm/kind-action`](https://www.github.com/helm/chart-releaser-actio
 
 ## Code of conduct
 
-Participation in the Helm community is governed by the [Code of Conduct](code-of-conduct.md).
+Participation in the Helm community is governed by the [Code of Conduct](CODE_OF_CONDUCT.md).
