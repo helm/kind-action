@@ -35,8 +35,8 @@ jobs:
   create-cluster:
     runs-on: ubuntu-latest
     steps:
-      - name: Create cluster
-        uses: helm/kind-action@master
+      - name: Create k8s Kind Cluster
+        uses: helm/kind-action@v1.0.0-alpha.2
         with:
           installLocalPathProvisioner: true
 ```
