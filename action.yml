@@ -3,7 +3,7 @@ description: "Create a kind (Kubernetes IN Docker) cluster"
 author: "The Helm authors"
 branding:
   color: blue
-  icon: check-circle
+  icon: box
 inputs:
   version:
     description: "The kind version to use (default: v0.5.1)"
