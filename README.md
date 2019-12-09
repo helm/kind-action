@@ -1,12 +1,13 @@
-# Kind action
+# *Kind* Action
 
-A GitHub Action for Kubernetes IN Docker - local clusters for testing Kubernetes, using [kubernetes-sigs/kind](https://kind.sigs.k8s.io/).
+A GitHub Action for Kubernetes IN Docker - local clusters for testing Kubernetes using [kubernetes-sigs/kind](https://kind.sigs.k8s.io/).
 
 ## Usage
 
 ### Pre-requisites
 
-1. Create a workflow YAML file in your `.github/workflows` directory. An [example workflow](#example-workflow) is available below. For more information, reference the GitHub Help Documentation for [Creating a workflow file](https://help.github.com/en/articles/configuring-a-workflow#creating-a-workflow-file).
+Create a workflow YAML file in your `.github/workflows` directory. An [example workflow](#example-workflow) is available below.
+For more information, reference the GitHub Help Documentation for [Creating a workflow file](https://help.github.com/en/articles/configuring-a-workflow#creating-a-workflow-file).
 
 ### Inputs
 
@@ -18,11 +19,10 @@ For more information on inputs, see the [API Documentation](https://developer.gi
 - `name`: The name of the cluster to create (default: `chart-testing`)
 - `wait`: The duration to wait for the control plane to become ready (default: `60s`)
 - `log-level`: The log level for kind
-- `install-local-path-provisioner`: If true, Rancher's local-path provisioner
-  is installed which supports dynamic volume provisioning on multi-node
-  clusters. The newly created local-path StorageClass is made the default.
+- `install-local-path-provisioner`: If true, Rancher's local-path provisioner is installed which supports dynamic volume provisioning on multi-node clusters.
+  The newly created local-path StorageClass is made the default.
 
-### Example workflow
+### Example Workflow
 
 Create a workflow (eg: `.github/workflows/create-cluster.yml`):
 
@@ -41,7 +41,8 @@ jobs:
           installLocalPathProvisioner: true
 ```
 
-This uses [@helm/kind-action](https://www.github.com/helm/kind-action) GitHub Action to spin up a [kind](https://kind.sigs.k8s.io/) Kubernetes cluster on every Pull Request. See [@helm/chart-testing-action](https://www.github.com/helm/chart-testing-action) for a more practical example.
+This uses [@helm/kind-action](https://www.github.com/helm/kind-action) GitHub Action to spin up a [kind](https://kind.sigs.k8s.io/) Kubernetes cluster on every Pull Request.
+See [@helm/chart-testing-action](https://www.github.com/helm/chart-testing-action) for a more practical example.
 
 ## Code of conduct
 
