@@ -19,7 +19,8 @@ For more information on inputs, see the [API Documentation](https://developer.gi
 - `name`: The name of the cluster to create (default: `chart-testing`)
 - `wait`: The duration to wait for the control plane to become ready (default: `60s`)
 - `log-level`: The log level for kind
-- `install-local-path-provisioner`: If true, Rancher's local-path provisioner is installed which supports dynamic volume provisioning on multi-node clusters. The newly created local-path StorageClass is made the default.
+- `install-local-path-provisioner`: If true, Rancher's local-path provisioner is installed which supports dynamic volume provisioning on multi-node clusters.
+  The newly created local-path StorageClass is made the default.
 
 ### Example Workflow
 
