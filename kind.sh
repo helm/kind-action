@@ -50,6 +50,7 @@ main() {
 
     parse_command_line "$@"
 
+    check_for_chart_changes
     install_kind
     install_kubectl
     create_kind_cluster
@@ -191,6 +192,16 @@ install_local_path_provisioner() {
 
     echo 'Available StorageClasses:'
     kubectl get storageclasses
+}
+
+check_for_chart_changes() {
+    git remote add chart-changes https://github.com/"${GITHUB_REPOSITORY}"
+    git fetch chart-changes master
+
+    if [ -z "$(git diff --find-renames --name-only "$(git rev-parse --abbrev-ref HEAD)" remotes/chart-changes/master -- charts)" ]; then
+        echo "No chart changes detected! Kind install not needed..."
+        exit 0
+    fi  
 }
 
 main "$@"
