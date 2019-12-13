@@ -1,4 +1,4 @@
-name: "Create k8s Kind Cluster"
+name: "Kind Cluster"
 description: "Create a kind (Kubernetes IN Docker) cluster"
 author: "The Helm authors"
 branding:
