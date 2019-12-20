@@ -126,7 +126,7 @@ parse_command_line() {
                     exit 1
                 fi
                 ;;
-            -p|--install-local-pasth-provisioner)
+            -p|--install-local-path-provisioner)
                 install_local_path_provisioner=true
                 ;;
             *)
