@@ -18,7 +18,7 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-DEFAULT_KIND_VERSION=v0.5.1
+DEFAULT_KIND_VERSION=v0.6.1
 DEFAULT_CLUSTER_NAME=chart-testing
 
 show_help() {
@@ -26,7 +26,7 @@ cat << EOF
 Usage: $(basename "$0") <options>
 
     -h, --help                              Display help
-    -v, --version                           The kind version to use (default: v0.5.1)"
+    -v, --version                           The kind version to use (default: v0.6.1)"
     -c, --config                            The path to the kind config file"
     -i, --node-image                        The Docker image for the cluster nodes"
     -n, --cluster-name                      The name of the cluster to create (default: chart-testing)"

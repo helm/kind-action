@@ -13,7 +13,7 @@ For more information, reference the GitHub Help Documentation for [Creating a wo
 
 For more information on inputs, see the [API Documentation](https://developer.github.com/v3/repos/releases/#input)
 
-- `version`: The kind version to use (default: `v0.5.1`)
+- `version`: The kind version to use (default: `v0.6.1`)
 - `config`: The path to the kind config file
 - `node-image`: The Docker image for the cluster nodes
 - `name`: The name of the cluster to create (default: `chart-testing`)

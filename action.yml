@@ -6,7 +6,7 @@ branding:
   icon: box
 inputs:
   version:
-    description: "The kind version to use (default: v0.5.1)"
+    description: "The kind version to use (default: v0.6.1)"
   config:
     description: "The path to the kind config file"
   node_image:
