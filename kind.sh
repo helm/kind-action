@@ -53,7 +53,6 @@ main() {
     install_kind
     install_kubectl
     create_kind_cluster
-    set_kubeconfig
 
     if [[ -n "$install_local_path_provisioner" ]]; then
         install_local_path_provisioner
@@ -170,13 +169,6 @@ create_kind_cluster() {
     fi
 
     kind "${args[@]}"
-}
-
-set_kubeconfig() {
-    local kubeconfig_path
-    kubeconfig_path=$(kind get kubeconfig-path "--name=$cluster_name")
-
-    mv "$kubeconfig_path" "$HOME/.kube/config"
 }
 
 install_local_path_provisioner() {
