@@ -18,7 +18,7 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-DEFAULT_KIND_VERSION=v0.5.1
+DEFAULT_KIND_VERSION=v0.6.1
 DEFAULT_CLUSTER_NAME=chart-testing
 
 show_help() {
@@ -26,7 +26,7 @@ cat << EOF
 Usage: $(basename "$0") <options>
 
     -h, --help                              Display help
-    -v, --version                           The kind version to use (default: v0.5.1)"
+    -v, --version                           The kind version to use (default: v0.6.1)"
     -c, --config                            The path to the kind config file"
     -i, --node-image                        The Docker image for the cluster nodes"
     -n, --cluster-name                      The name of the cluster to create (default: chart-testing)"
@@ -53,7 +53,6 @@ main() {
     install_kind
     install_kubectl
     create_kind_cluster
-    set_kubeconfig
 
     if [[ -n "$install_local_path_provisioner" ]]; then
         install_local_path_provisioner
@@ -170,13 +169,6 @@ create_kind_cluster() {
     fi
 
     kind "${args[@]}"
-}
-
-set_kubeconfig() {
-    local kubeconfig_path
-    kubeconfig_path=$(kind get kubeconfig-path "--name=$cluster_name")
-
-    mv "$kubeconfig_path" "$HOME/.kube/config"
 }
 
 install_local_path_provisioner() {
