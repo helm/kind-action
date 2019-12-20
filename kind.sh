@@ -86,7 +86,7 @@ parse_command_line() {
                     exit 1
                 fi
                 ;;
-            -i|--node_image)
+            -i|--node-image)
                 if [[ -n "${2:-}" ]]; then
                     node_image="$2"
                     shift
@@ -96,7 +96,7 @@ parse_command_line() {
                     exit 1
                 fi
                 ;;
-            -n|--cluster_name)
+            -n|--cluster-name)
                 if [[ -n "${2:-}" ]]; then
                     cluster_name="$2"
                     shift
