@@ -1,0 +1,21 @@
+name: Test
+
+on:
+  - pull_request
+
+jobs:
+  lint-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Create kind cluster
+        uses: ./
+        with:
+          install_local_path_provisioner: true
+
+      - name: Test
+        run: |
+          kubectl cluster-info
+          kubectl get storageclass local-path
