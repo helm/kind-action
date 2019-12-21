@@ -20,7 +20,7 @@ set -o pipefail
 
 DEFAULT_KIND_VERSION=v0.6.1
 DEFAULT_CLUSTER_NAME=chart-testing
-DEFAULT_KUBECTL_VERSION=v1.17.0
+KUBECTL_VERSION=v1.17.0
 
 show_help() {
 cat << EOF
@@ -148,7 +148,7 @@ install_kind() {
 
 install_kubectl() {
     echo 'Installing kubectl...'
-    curl -sSLO "https://storage.googleapis.com/kubernetes-release/release/$DEFAULT_KUBECTL_VERSION/bin/linux/amd64/kubectl"
+    curl -sSLO "https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
     chmod +x kubectl
     sudo mv kubectl /usr/local/bin/kubectl
 }
