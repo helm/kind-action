@@ -148,7 +148,7 @@ install_kind() {
 
 install_kubectl() {
     echo 'Installing kubectl...'
-    curl -sSLO https://storage.googleapis.com/kubernetes-release/release/${DEFAULT_KUBECTL_VERSION}/bin/linux/amd64/kubectl
+    curl -sSLO "https://storage.googleapis.com/kubernetes-release/release/$DEFAULT_KUBECTL_VERSION/bin/linux/amd64/kubectl"
     chmod +x kubectl
     sudo mv kubectl /usr/local/bin/kubectl
 }
