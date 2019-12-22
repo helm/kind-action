@@ -5,7 +5,9 @@ on:
   push:
     branches:
       - master
-      - releases/*
+  release:
+    types:
+      - created
 
 jobs:
   lint-test:
