@@ -1,5 +1,7 @@
 # *Kind* Action
 
+[![](https://github.com/helm/kind-action/workflows/Test/badge.svg?branch=master)](https://github.com/helm/kind-action/actions)
+
 A GitHub Action for Kubernetes IN Docker - local clusters for testing Kubernetes using [kubernetes-sigs/kind](https://kind.sigs.k8s.io/).
 
 ## Usage
