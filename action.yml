@@ -20,7 +20,7 @@ inputs:
   install_local_path_provisioner:
     description: |
       If true, Rancher's local-path provisioner is installed which supports
-      dynamic volume provisioning on multi-node clusters. 
+      dynamic volume provisioning on multi-node clusters.
 runs:
   using: "node12"
   main: "main.js"
