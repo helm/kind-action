@@ -20,4 +20,4 @@ jobs:
       - name: Test
         run: |
           kubectl cluster-info
-          kubectl get storageclass local-path
+
