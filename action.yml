@@ -17,10 +17,6 @@ inputs:
     description: "The duration to wait for the control plane to become ready (default: 60s)"
   log_level:
     description: "The log level for kind"
-  install_local_path_provisioner:
-    description: |
-      If true, Rancher's local-path provisioner is installed which supports
-      dynamic volume provisioning on multi-node clusters.
 runs:
   using: "node12"
   main: "main.js"

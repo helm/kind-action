@@ -47,10 +47,6 @@ main() {
         args+=(--log-level "${INPUT_LOG_LEVEL}")
     fi
 
-    if [[ -n "${INPUT_INSTALL_LOCAL_PATH_PROVISIONER:-}" ]]; then
-        args+=(--install-local-path-provisioner)
-    fi
-
     "$SCRIPT_DIR/kind.sh" "${args[@]}"
 }
 

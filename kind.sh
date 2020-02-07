@@ -33,8 +33,6 @@ Usage: $(basename "$0") <options>
     -n, --cluster-name                      The name of the cluster to create (default: chart-testing)"
     -w, --wait                              The duration to wait for the control plane to become ready (default: 60s)"
     -l, --log-level                         The log level for kind [panic, fatal, error, warning, info, debug, trace] (default: warning)
-    -p, --install-local-path-provisioner    If true, Rancher's local-path provisioner is installed which supports
-                                            dynamic volume provisioning on multi-node clusters.
 
 EOF
 }
@@ -46,7 +44,6 @@ main() {
     local cluster_name="$DEFAULT_CLUSTER_NAME"
     local wait=60s
     local log_level=
-    local install_local_path_provisioner=
 
     parse_command_line "$@"
 
@@ -54,9 +51,6 @@ main() {
     install_kubectl
     create_kind_cluster
 
-    if [[ "$install_local_path_provisioner" == "true" ]]; then
-        install_local_path_provisioner
-    fi
 }
 
 parse_command_line() {
@@ -126,16 +120,6 @@ parse_command_line() {
                     exit 1
                 fi
                 ;;
-            -p|--install-local-path-provisioner)
-                if [[ -n "${2:-}" ]]; then
-                   install_local_path_provisioner="$2"
-                   shift
-                else
-                    echo "ERROR: '--install-local-path-provisioner' cannot be empty." >&2
-                    show_help
-                    exit 1
-                fi
-                ;;
             *)
                 break
                 ;;
@@ -176,20 +160,6 @@ create_kind_cluster() {
     fi
 
     kind "${args[@]}"
-}
-
-install_local_path_provisioner() {
-    echo 'Installing local-path provisioner...'
-    kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/master/deploy/local-path-storage.yaml
-
-    echo 'Changing default StorageClass...'
-    kubectl patch storageclass standard --patch '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'
-    kubectl patch storageclass standard --patch '{"metadata": {"annotations": {"storageclass.beta.kubernetes.io/is-default-class": "false"}}}'
-    kubectl patch storageclass local-path --patch '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "true"}}}'
-    kubectl patch storageclass local-path --patch '{"metadata": {"annotations": {"storageclass.beta.kubernetes.io/is-default-class": "true"}}}'
-
-    echo 'Available StorageClasses:'
-    kubectl get storageclasses
 }
 
 main "$@"
