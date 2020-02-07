@@ -16,10 +16,8 @@ jobs:
 
       - name: Create kind cluster
         uses: ./
-        with:
-          install_local_path_provisioner: true
 
       - name: Test
         run: |
           kubectl cluster-info
-          kubectl get storageclass local-path
+          kubectl get storageclass standard

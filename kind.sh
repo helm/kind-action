@@ -18,7 +18,7 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-DEFAULT_KIND_VERSION=v0.6.1
+DEFAULT_KIND_VERSION=v0.7.0
 DEFAULT_CLUSTER_NAME=chart-testing
 KUBECTL_VERSION=v1.17.0
 
@@ -27,15 +27,12 @@ cat << EOF
 Usage: $(basename "$0") <options>
 
     -h, --help                              Display help
-    -v, --version                           The kind version to use (default: v0.6.1)"
+    -v, --version                           The kind version to use (default: v0.7.0)"
     -c, --config                            The path to the kind config file"
     -i, --node-image                        The Docker image for the cluster nodes"
     -n, --cluster-name                      The name of the cluster to create (default: chart-testing)"
     -w, --wait                              The duration to wait for the control plane to become ready (default: 60s)"
     -l, --log-level                         The log level for kind [panic, fatal, error, warning, info, debug, trace] (default: warning)
-    -p, --install-local-path-provisioner    If true, Rancher's local-path provisioner is installed which supports
-                                            dynamic volume provisioning on multi-node clusters. The newly created
-                                            local-path StorageClass is made the default.
 
 EOF
 }
@@ -47,7 +44,6 @@ main() {
     local cluster_name="$DEFAULT_CLUSTER_NAME"
     local wait=60s
     local log_level=
-    local install_local_path_provisioner=
 
     parse_command_line "$@"
 
@@ -55,9 +51,6 @@ main() {
     install_kubectl
     create_kind_cluster
 
-    if [[ -n "$install_local_path_provisioner" ]]; then
-        install_local_path_provisioner
-    fi
 }
 
 parse_command_line() {
@@ -127,9 +120,6 @@ parse_command_line() {
                     exit 1
                 fi
                 ;;
-            -p|--install-local-path-provisioner)
-                install_local_path_provisioner=true
-                ;;
             *)
                 break
                 ;;
@@ -170,20 +160,6 @@ create_kind_cluster() {
     fi
 
     kind "${args[@]}"
-}
-
-install_local_path_provisioner() {
-    echo 'Installing local-path provisioner...'
-    kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/master/deploy/local-path-storage.yaml
-
-    echo 'Changing default StorageClass...'
-    kubectl patch storageclass standard --patch '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'
-    kubectl patch storageclass standard --patch '{"metadata": {"annotations": {"storageclass.beta.kubernetes.io/is-default-class": "false"}}}'
-    kubectl patch storageclass local-path --patch '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "true"}}}'
-    kubectl patch storageclass local-path --patch '{"metadata": {"annotations": {"storageclass.beta.kubernetes.io/is-default-class": "true"}}}'
-
-    echo 'Available StorageClasses:'
-    kubectl get storageclasses
 }
 
 main "$@"
