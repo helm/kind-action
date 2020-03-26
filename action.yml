@@ -12,7 +12,7 @@ inputs:
   node_image:
     description: "The Docker image for the cluster nodes"
   cluster_name:
-    description: "The name of the cluster to create (default: chart-testing)"
+    description: "The name of the cluster to create (default: kind)"
   wait:
     description: "The duration to wait for the control plane to become ready (default: 60s)"
   log_level:

@@ -18,7 +18,7 @@ For more information on inputs, see the [API Documentation](https://developer.gi
 - `version`: The kind version to use (default: `v0.7.0`)
 - `config`: The path to the kind config file
 - `node_image`: The Docker image for the cluster nodes
-- `cluster_name`: The name of the cluster to create (default: `chart-testing`)
+- `cluster_name`: The name of the cluster to create (default: `kind`)
 - `wait`: The duration to wait for the control plane to become ready (default: `60s`)
 - `log_level`: The log level for kind
 
