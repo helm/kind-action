@@ -20,3 +20,19 @@ jobs:
         run: |
           kubectl cluster-info
           kubectl get storageclass standard
+
+  test-with-custom-name:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Create kind cluster with custom name
+        uses: ./
+        with:
+          cluster_name: "custom-name"
+
+      - name: Test
+        run: |
+          kubectl cluster-info
+          kubectl get storageclass standard
