@@ -30,7 +30,12 @@ main() {
     fi
 
     kind delete cluster "${args[@]}"
+
+    registry_id=$(docker ps --filter "name=kind-registry" --format "{{.ID}}")
+    if [[ -n "$registry_id" ]]; then
+      echo "Deleting kind-registry..."
+      docker rm --force kind-registry
+    fi
 }
 
 main
-

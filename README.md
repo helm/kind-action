@@ -21,6 +21,7 @@ For more information on inputs, see the [API Documentation](https://developer.gi
 - `cluster_name`: The name of the cluster to create (default: `chart-testing`)
 - `wait`: The duration to wait for the control plane to become ready (default: `60s`)
 - `log_level`: The log level for kind
+- `registry`: Configures a registry on localhost:5000 to be used with kind (default: `false`)
 
 ### Example Workflow
 

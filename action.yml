@@ -6,7 +6,7 @@ branding:
   icon: box
 inputs:
   version:
-    description: "The kind version to use (default: v0.7.0)"
+    description: "The kind version to use (default: v0.8.1)"
   config:
     description: "The path to the kind config file"
   node_image:
@@ -17,6 +17,8 @@ inputs:
     description: "The duration to wait for the control plane to become ready (default: 60s)"
   log_level:
     description: "The log level for kind"
+  registry:
+    description: "Configures a registry on localhost:5000 to be used with kind (default: false)"
 runs:
   using: "node12"
   main: "main.js"

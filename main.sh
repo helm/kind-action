@@ -47,8 +47,18 @@ main() {
         args+=(--log-level "${INPUT_LOG_LEVEL}")
     fi
 
+
+    if [[ -n "${INPUT_REGISTRY:-}" ]] && [[ "${INPUT_REGISTRY,,}" = "true" ]]; then
+        "$SCRIPT_DIR/registry.sh" "${args[@]}"
+
+        if [[ -n "${INPUT_CONFIG:-}" ]]; then
+            echo 'WARNING: when using the "config" option, you need to manually configure the registry in the provided configuration'
+        else
+            args+=(--config "/etc/kind-registry/config.yaml")
+        fi
+    fi
+
     "$SCRIPT_DIR/kind.sh" "${args[@]}"
 }
 
 main
-

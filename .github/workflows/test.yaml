@@ -36,3 +36,44 @@ jobs:
         run: |
           kubectl cluster-info
           kubectl get storageclass standard
+
+  test-with-registry:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Create kind cluster with registry
+        uses: ./
+        with:
+          registry: true
+
+      - name: Test
+        run: |
+          kubectl cluster-info
+          kubectl get storageclass standard
+
+          # Checking env variable
+          if [[ "$KIND_REGISTRY" != "localhost:5000" ]]; then
+            echo "Wrong KIND_REGISTRY env variable: $KIND_REGISTRY"
+            exit 1
+          fi
+
+          # Test registry usage inside cluster
+          docker pull busybox
+          docker tag busybox localhost:5000/localbusybox
+          docker push localhost:5000/localbusybox
+
+          kubectl create job test --image=localhost:5000/localbusybox
+          i=1
+          max=60
+          while [[ $i -le $max ]] && [[ $(kubectl get pods -l job-name=test -o 'jsonpath={..status.phase}') != "Succeeded" ]]; do
+            echo "Waiting for pod to complete ($i/$max)..."
+            ((i++))
+            sleep 1
+          done
+          if [[ $i -ge $max ]]; then
+            echo "ERROR:  Pod did not complete!"
+            kubectl get pods -o yaml
+            exit 1
+          fi
