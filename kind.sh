@@ -20,7 +20,7 @@ set -o pipefail
 
 DEFAULT_KIND_VERSION=v0.10.0
 DEFAULT_CLUSTER_NAME=chart-testing
-KUBECTL_VERSION=v1.19.1
+KUBECTL_VERSION=v1.20.2
 
 show_help() {
 cat << EOF
