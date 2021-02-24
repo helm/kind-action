@@ -27,10 +27,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Create kind cluster with custom name
+      - name: Create kind cluster with custom vars
         uses: ./
         with:
           cluster_name: "custom-name"
+          config: ./tests/config.yaml
+          wait: 61s
+          log_level: DEBUG
+          
 
       - name: Test
         run: |
