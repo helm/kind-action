@@ -28,7 +28,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Create kind cluster with custom vars
-        uses: ./
+        uses: helm/kind-action@$GITHUB_SHA
         with:
           cluster_name: "custom-name"
           config: ./tests/config.yaml
