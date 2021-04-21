@@ -4,7 +4,8 @@ on:
   pull_request:
   push:
     branches:
-      - master
+      - main
+      - releases/*
 
 jobs:
   lint-test:
