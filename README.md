@@ -35,8 +35,16 @@ jobs:
   create-cluster:
     runs-on: ubuntu-latest
     steps:
+    
+      # if config used to install kind is located in your repository
+      # you may want to checkout first to make it available to kind-action
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
       - name: Create k8s Kind Cluster
         uses: helm/kind-action@v1.1.0
+        with:
+          config: kind.config.yaml
 ```
 
 This uses [@helm/kind-action](https://www.github.com/helm/kind-action) GitHub Action to spin up a [kind](https://kind.sigs.k8s.io/) Kubernetes cluster on every Pull Request.
