@@ -21,6 +21,7 @@ set -o pipefail
 DEFAULT_KIND_VERSION=v0.11.1
 DEFAULT_CLUSTER_NAME=chart-testing
 KUBECTL_VERSION=v1.20.8
+DEFAULT_NODE_IMAGE=v1.20.7
 
 show_help() {
 cat << EOF
@@ -40,7 +41,7 @@ EOF
 main() {
     local version="$DEFAULT_KIND_VERSION"
     local config=
-    local node_image=
+    local node_image="$DEFAULT_NODE_IMAGE"
     local cluster_name="$DEFAULT_CLUSTER_NAME"
     local wait=60s
     local log_level=

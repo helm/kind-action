@@ -10,7 +10,7 @@ inputs:
   config:
     description: "The path to the kind config file"
   node_image:
-    description: "The Docker image for the cluster nodes"
+    description: "The Docker image for the cluster nodes (default: v1.20.7)"
   cluster_name:
     description: "The name of the cluster to create (default: chart-testing)"
   wait:
