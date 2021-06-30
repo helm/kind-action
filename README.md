@@ -15,7 +15,7 @@ For more information, reference the GitHub Help Documentation for [Creating a wo
 
 For more information on inputs, see the [API Documentation](https://developer.github.com/v3/repos/releases/#input)
 
-- `version`: The kind version to use (default: `v0.9.0`)
+- `version`: The kind version to use (default: `v0.11.1`)
 - `config`: The path to the kind config file
 - `node_image`: The Docker image for the cluster nodes
 - `cluster_name`: The name of the cluster to create (default: `chart-testing`)
