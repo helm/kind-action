@@ -20,7 +20,7 @@ set -o pipefail
 
 DEFAULT_KIND_VERSION=v0.11.1
 DEFAULT_CLUSTER_NAME=chart-testing
-KUBECTL_VERSION=v1.20.8
+DEFAULT_KUBECTL_VERSION=v1.20.8
 
 show_help() {
 cat << EOF
@@ -33,6 +33,7 @@ Usage: $(basename "$0") <options>
     -n, --cluster-name                      The name of the cluster to create (default: chart-testing)"
     -w, --wait                              The duration to wait for the control plane to become ready (default: 60s)"
     -l, --log-level                         The log level for kind [panic, fatal, error, warning, info, debug, trace] (default: warning)
+    -k, --kubectl-version                   The kubectl version to use (default: $DEFAULT_KUBECTL_VERSION)"
 
 EOF
 }
@@ -44,6 +45,7 @@ main() {
     local cluster_name="$DEFAULT_CLUSTER_NAME"
     local wait=60s
     local log_level=
+    local kubectl_version="$DEFAULT_KUBECTL_VERSION"
 
     parse_command_line "$@"
 
@@ -145,6 +147,16 @@ parse_command_line() {
                     exit 1
                 fi
                 ;;
+            -k|--kubectl-version)
+                if [[ -n "${2:-}" ]]; then
+                    kubectl_version="$2"
+                    shift
+                else
+                    echo "ERROR: '-k|--kubectl-version' cannot be empty." >&2
+                    show_help
+                    exit 1
+                fi
+                ;;
             *)
                 break
                 ;;
@@ -168,7 +180,7 @@ install_kubectl() {
 
     mkdir -p "$kubectl_dir"
 
-    curl -sSLo "$kubectl_dir/kubectl" "https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
+    curl -sSLo "$kubectl_dir/kubectl" "https://storage.googleapis.com/kubernetes-release/release/$kubectl_version/bin/linux/amd64/kubectl"
     chmod +x "$kubectl_dir/kubectl"
 }
 

@@ -47,6 +47,10 @@ main() {
         args+=(--log-level "${INPUT_LOG_LEVEL}")
     fi
 
+    if [[ -n "${INPUT_KUBECTL_VERSION:-}" ]]; then
+        args+=(--kubectl-version "${INPUT_KUBECTL_VERSION}")
+    fi
+
     "$SCRIPT_DIR/kind.sh" "${args[@]}"
 }
 
