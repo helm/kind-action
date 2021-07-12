@@ -21,6 +21,7 @@ set -o pipefail
 DEFAULT_KIND_VERSION=v0.11.1
 DEFAULT_CLUSTER_NAME=chart-testing
 KUBECTL_VERSION=v1.20.8
+DEFAULT_NODE_IMAGE=v1.20.7
 
 show_help() {
 cat << EOF
@@ -32,7 +33,7 @@ Usage: $(basename "$0") <options>
     -i, --node-image                        The Docker image for the cluster nodes"
     -n, --cluster-name                      The name of the cluster to create (default: chart-testing)"
     -w, --wait                              The duration to wait for the control plane to become ready (default: 60s)"
-    -l, --log-level                         The log level for kind [panic, fatal, error, warning, info, debug, trace] (default: warning)
+    -v                                      The verbosity level for kind (int32)
 
 EOF
 }
@@ -40,10 +41,10 @@ EOF
 main() {
     local version="$DEFAULT_KIND_VERSION"
     local config=
-    local node_image=
+    local node_image="$DEFAULT_NODE_IMAGE"
     local cluster_name="$DEFAULT_CLUSTER_NAME"
     local wait=60s
-    local log_level=
+    local verbosity=
 
     parse_command_line "$@"
 
@@ -135,12 +136,12 @@ parse_command_line() {
                     exit 1
                 fi
                 ;;
-            -l|--log-level)
+            -v)
                 if [[ -n "${2:-}" ]]; then
-                    log_level="$2"
+                    verbosity="$2"
                     shift
                 else
-                    echo "ERROR: '--log-level' cannot be empty." >&2
+                    echo "ERROR: '-v' cannot be empty." >&2
                     show_help
                     exit 1
                 fi
@@ -184,8 +185,8 @@ create_kind_cluster() {
         args+=("--config=$config")
     fi
 
-    if [[ -n "$log_level" ]]; then
-        args+=("--loglevel=$log_level")
+    if [[ -n "$verbosity" ]]; then
+        args+=("-v=$verbosity")
     fi
 
     "$kind_dir/kind" "${args[@]}"
