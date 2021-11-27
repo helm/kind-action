@@ -19,6 +19,8 @@ inputs:
     description: "The log level for kind"
   kubectl_version:
     description: "The kubectl version to use (default: v1.20.8)"
+  install_only:
+    description: "Skips cluster creation, only install kind (default: false)"
 runs:
   using: "node12"
   main: "main.js"
