@@ -6,7 +6,7 @@ branding:
   icon: box
 inputs:
   version:
-    description: "The kind version to use (default: v0.11.1)"
+    description: "The kind version to use (default: v0.12.0)"
   config:
     description: "The path to the kind config file"
   node_image:
@@ -18,7 +18,7 @@ inputs:
   log_level:
     description: "The log level for kind"
   kubectl_version:
-    description: "The kubectl version to use (default: v1.20.8)"
+    description: "The kubectl version to use (default: v1.23.4)"
 runs:
   using: "node12"
   main: "main.js"
