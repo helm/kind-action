@@ -20,7 +20,7 @@ For more information on inputs, see the [API Documentation](https://developer.gi
 - `node_image`: The Docker image for the cluster nodes
 - `cluster_name`: The name of the cluster to create (default: `chart-testing`)
 - `wait`: The duration to wait for the control plane to become ready (default: `60s`)
-- `log_level`: The log level for kind
+- `verbosity`: The verbosity level for kind
 - `kubectl_version`: The kubectl version to use (default: v1.20.8)
 
 ### Example Workflow

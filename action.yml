@@ -15,8 +15,8 @@ inputs:
     description: "The name of the cluster to create (default: chart-testing)"
   wait:
     description: "The duration to wait for the control plane to become ready (default: 60s)"
-  log_level:
-    description: "The log level for kind"
+  verbosity:
+    description: "The verbosity level for kind"
   kubectl_version:
     description: "The kubectl version to use (default: v1.20.8)"
 runs:
