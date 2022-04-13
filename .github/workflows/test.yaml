@@ -37,3 +37,19 @@ jobs:
         run: |
           kubectl cluster-info
           kubectl get storageclass standard
+
+  test-with-custom-k8s-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Create kind cluster with custom name
+        uses: ./
+        with:
+          kubectl_version: "v1.23.4"
+
+      - name: Test
+        run: |
+          kubectl cluster-info
+          kubectl get nodes
