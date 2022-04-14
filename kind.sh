@@ -18,9 +18,9 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-DEFAULT_KIND_VERSION=v0.11.1
+DEFAULT_KIND_VERSION=v0.12.0
 DEFAULT_CLUSTER_NAME=chart-testing
-DEFAULT_KUBECTL_VERSION=v1.20.8
+DEFAULT_KUBECTL_VERSION=v1.21.10
 
 show_help() {
 cat << EOF
@@ -57,7 +57,7 @@ main() {
     fi
 
     local arch
-    arch=$(uname -m)
+    arch=$(dpkg --print-architecture)
     local cache_dir="$RUNNER_TOOL_CACHE/kind/$version/$arch"
 
     local kind_dir="$cache_dir/kind/bin/"
@@ -183,7 +183,7 @@ install_kind() {
 
     mkdir -p "$kind_dir"
 
-    curl -sSLo "$kind_dir/kind" "https://github.com/kubernetes-sigs/kind/releases/download/$version/kind-linux-amd64"
+    curl -sSLo "$kind_dir/kind" "https://github.com/kubernetes-sigs/kind/releases/download/$version/kind-linux-$arch"
     chmod +x "$kind_dir/kind"
 }
 
@@ -192,7 +192,7 @@ install_kubectl() {
 
     mkdir -p "$kubectl_dir"
 
-    curl -sSLo "$kubectl_dir/kubectl" "https://storage.googleapis.com/kubernetes-release/release/$kubectl_version/bin/linux/amd64/kubectl"
+    curl -sSLo "$kubectl_dir/kubectl" "https://storage.googleapis.com/kubernetes-release/release/$kubectl_version/bin/linux/$arch/kubectl"
     chmod +x "$kubectl_dir/kubectl"
 }
 
