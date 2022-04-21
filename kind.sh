@@ -27,13 +27,14 @@ cat << EOF
 Usage: $(basename "$0") <options>
 
     -h, --help                              Display help
-    -v, --version                           The kind version to use (default: $DEFAULT_KIND_VERSION)"
-    -c, --config                            The path to the kind config file"
-    -i, --node-image                        The Docker image for the cluster nodes"
-    -n, --cluster-name                      The name of the cluster to create (default: chart-testing)"
-    -w, --wait                              The duration to wait for the control plane to become ready (default: 60s)"
+    -v, --version                           The kind version to use (default: $DEFAULT_KIND_VERSION)
+    -c, --config                            The path to the kind config file
+    -i, --node-image                        The Docker image for the cluster nodes
+    -n, --cluster-name                      The name of the cluster to create (default: chart-testing)
+    -w, --wait                              The duration to wait for the control plane to become ready (default: 60s)
     -l, --log-level                         The log level for kind [panic, fatal, error, warning, info, debug, trace] (default: warning)
-    -k, --kubectl-version                   The kubectl version to use (default: $DEFAULT_KUBECTL_VERSION)"
+    -k, --kubectl-version                   The kubectl version to use (default: $DEFAULT_KUBECTL_VERSION)
+    -o, --install-only                      Skips cluster creation, only install kind (default: false)
 
 EOF
 }
@@ -46,6 +47,7 @@ main() {
     local wait=60s
     local log_level=
     local kubectl_version="$DEFAULT_KUBECTL_VERSION"
+    local install_only=false
 
     parse_command_line "$@"
 
@@ -77,7 +79,9 @@ main() {
     "$kind_dir/kind" version
     "$kubectl_dir/kubectl" version --client=true
 
-    create_kind_cluster
+    if [[ "$install_only" == false ]]; then
+      create_kind_cluster
+    fi
 }
 
 parse_command_line() {
@@ -155,6 +159,14 @@ parse_command_line() {
                     echo "ERROR: '-k|--kubectl-version' cannot be empty." >&2
                     show_help
                     exit 1
+                fi
+                ;;
+            -o|--install-only)
+                if [[ -n "${2:-}" ]]; then
+                    install_only="$2"
+                    shift
+                else
+                    install_only=true
                 fi
                 ;;
             *)

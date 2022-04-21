@@ -30,6 +30,8 @@ inputs:
     description: "The kubectl version to use (default: v1.21.10)"
     required: false
     default: "v1.21.10"
+  install_only:
+    description: "Skips cluster creation, only install kind (default: false)"
 runs:
   using: "node12"
   main: "main.js"

@@ -22,6 +22,7 @@ For more information on inputs, see the [API Documentation](https://developer.gi
 - `wait`: The duration to wait for the control plane to become ready (default: `60s`)
 - `log_level`: The log level for kind
 - `kubectl_version`: The kubectl version to use (default: v1.21.10)
+- `install_only`: Skips cluster creation, only install kind (default: false)
 
 ### Example Workflow
 

@@ -51,8 +51,11 @@ main() {
         args+=(--kubectl-version "${INPUT_KUBECTL_VERSION}")
     fi
 
+    if [[ -n "${INPUT_INSTALL_ONLY:-}" ]]; then
+        args+=(--install-only)
+    fi
+
     "$SCRIPT_DIR/kind.sh" ${args[@]+"${args[@]}"}
 }
 
 main
-
