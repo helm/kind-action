@@ -35,6 +35,6 @@ inputs:
     description: "Skips cluster creation, only install kind (default: false)"
     required: false
 runs:
-  using: "node12"
+  using: "node16"
   main: "main.js"
   post: "cleanup.js"
