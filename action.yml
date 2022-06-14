@@ -6,9 +6,9 @@ branding:
   icon: box
 inputs:
   version:
-    description: "The kind version to use (default: v0.12.0)"
+    description: "The kind version to use (default: v0.14.0)"
     required: false
-    default: "v0.12.0"
+    default: "v0.14.0"
   config:
     description: "The path to the kind config file"
     required: false
@@ -23,16 +23,18 @@ inputs:
     description: "The duration to wait for the control plane to become ready (default: 60s)"
     required: false
     default: "60s"
-  log_level:
-    description: "The log level for kind"
+  verbosity:
+    description: "The verbosity level for kind (default: 0)"
+    default: "0"
     required: false
   kubectl_version:
-    description: "The kubectl version to use (default: v1.21.10)"
+    description: "The kubectl version to use (default: v1.22.10)"
     required: false
-    default: "v1.21.10"
+    default: "v1.22.10"
   install_only:
     description: "Skips cluster creation, only install kind (default: false)"
+    required: false
 runs:
-  using: "node12"
+  using: "node16"
   main: "main.js"
   post: "cleanup.js"

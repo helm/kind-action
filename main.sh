@@ -43,8 +43,8 @@ main() {
         args+=(--wait "${INPUT_WAIT}")
     fi
 
-    if [[ -n "${INPUT_LOG_LEVEL:-}" ]]; then
-        args+=(--log-level "${INPUT_LOG_LEVEL}")
+    if [[ -n "${INPUT_VERBOSITY:-}" ]]; then
+        args+=(--verbosity "${INPUT_VERBOSITY}")
     fi
 
     if [[ -n "${INPUT_KUBECTL_VERSION:-}" ]]; then

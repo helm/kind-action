@@ -15,13 +15,13 @@ For more information, reference the GitHub Help Documentation for [Creating a wo
 
 For more information on inputs, see the [API Documentation](https://developer.github.com/v3/repos/releases/#input)
 
-- `version`: The kind version to use (default: `v0.12.0`)
+- `version`: The kind version to use (default: `v0.14.0`)
 - `config`: The path to the kind config file
 - `node_image`: The Docker image for the cluster nodes
 - `cluster_name`: The name of the cluster to create (default: `chart-testing`)
 - `wait`: The duration to wait for the control plane to become ready (default: `60s`)
-- `log_level`: The log level for kind
-- `kubectl_version`: The kubectl version to use (default: v1.21.10)
+- `verbosity`: info log verbosity, higher value produces more output
+- `kubectl_version`: The kubectl version to use (default: v1.22.10)
 - `install_only`: Skips cluster creation, only install kind (default: false)
 
 ### Example Workflow
@@ -38,7 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Create k8s Kind Cluster
-        uses: helm/kind-action@v1.2.0
+        uses: helm/kind-action@v1.3.0
 ```
 
 This uses [@helm/kind-action](https://www.github.com/helm/kind-action) GitHub Action to spin up a [kind](https://kind.sigs.k8s.io/) Kubernetes cluster on every Pull Request.
