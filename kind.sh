@@ -18,21 +18,21 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-DEFAULT_KIND_VERSION=v0.12.0
+DEFAULT_KIND_VERSION=v0.14.0
 DEFAULT_CLUSTER_NAME=chart-testing
-DEFAULT_KUBECTL_VERSION=v1.21.10
+DEFAULT_KUBECTL_VERSION=v1.22.10
 
 show_help() {
 cat << EOF
 Usage: $(basename "$0") <options>
 
-    -h, --help                              Display help
+        --help                              Display help
     -v, --version                           The kind version to use (default: $DEFAULT_KIND_VERSION)
     -c, --config                            The path to the kind config file
     -i, --node-image                        The Docker image for the cluster nodes
     -n, --cluster-name                      The name of the cluster to create (default: chart-testing)
     -w, --wait                              The duration to wait for the control plane to become ready (default: 60s)
-    -l, --log-level                         The log level for kind [panic, fatal, error, warning, info, debug, trace] (default: warning)
+    -l, --verbosity                         info log verbosity, higher value produces more output
     -k, --kubectl-version                   The kubectl version to use (default: $DEFAULT_KUBECTL_VERSION)
     -o, --install-only                      Skips cluster creation, only install kind (default: false)
 
@@ -45,7 +45,7 @@ main() {
     local node_image=
     local cluster_name="$DEFAULT_CLUSTER_NAME"
     local wait=60s
-    local log_level=
+    local verbosity=
     local kubectl_version="$DEFAULT_KUBECTL_VERSION"
     local install_only=false
 
@@ -91,7 +91,7 @@ parse_command_line() {
                 show_help
                 exit
                 ;;
-            -v|--version)
+            --version)
                 if [[ -n "${2:-}" ]]; then
                     version="$2"
                     shift
@@ -141,12 +141,12 @@ parse_command_line() {
                     exit 1
                 fi
                 ;;
-            -l|--log-level)
+            -v|--verbosity)
                 if [[ -n "${2:-}" ]]; then
-                    log_level="$2"
+                    verbosity="$2"
                     shift
                 else
-                    echo "ERROR: '--log-level' cannot be empty." >&2
+                    echo "ERROR: '--verbosity' cannot be empty." >&2
                     show_help
                     exit 1
                 fi
@@ -208,8 +208,8 @@ create_kind_cluster() {
         args+=("--config=$config")
     fi
 
-    if [[ -n "$log_level" ]]; then
-        args+=("--loglevel=$log_level")
+    if [[ -n "$verbosity" ]]; then
+        args+=("--verbosity=$verbosity")
     fi
 
     "$kind_dir/kind" "${args[@]}"
