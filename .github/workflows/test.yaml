@@ -78,7 +78,7 @@ jobs:
       - name: Create kind cluster with custom name
         uses: ./
         with:
-          kubectl_version: "v1.23.4"
+          kubectl_version: "v1.24.6"
 
       - name: Test
         run: |
@@ -94,7 +94,7 @@ jobs:
       - name: Create kind cluster with custom name
         uses: ./
         with:
-          node_image: "kindest/node:v1.24.0"
+          node_image: "kindest/node:v1.24.6"
 
       - name: Test
         run: |
