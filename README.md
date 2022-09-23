@@ -15,13 +15,13 @@ For more information, reference the GitHub Help Documentation for [Creating a wo
 
 For more information on inputs, see the [API Documentation](https://developer.github.com/v3/repos/releases/#input)
 
-- `version`: The kind version to use (default: `v0.14.0`)
+- `version`: The kind version to use (default: `v0.16.0`)
 - `config`: The path to the kind config file
 - `node_image`: The Docker image for the cluster nodes
 - `cluster_name`: The name of the cluster to create (default: `chart-testing`)
 - `wait`: The duration to wait for the control plane to become ready (default: `60s`)
 - `verbosity`: info log verbosity, higher value produces more output
-- `kubectl_version`: The kubectl version to use (default: v1.22.10)
+- `kubectl_version`: The kubectl version to use (default: v1.23.12)
 - `install_only`: Skips cluster creation, only install kind (default: false)
 
 ### Example Workflow
