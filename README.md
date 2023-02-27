@@ -23,6 +23,7 @@ For more information on inputs, see the [API Documentation](https://developer.gi
 - `verbosity`: info log verbosity, higher value produces more output
 - `kubectl_version`: The kubectl version to use (default: v1.23.12)
 - `install_only`: Skips cluster creation, only install kind (default: false)
+- `ignore_failed_clean`: Whether to ignore the post delete cluster action failing (default: false)
 
 ### Example Workflow
 

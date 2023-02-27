@@ -100,3 +100,20 @@ jobs:
         run: |
           kubectl cluster-info
           kubectl get nodes
+
+  test-with-ignore-failed-clean:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+
+      - name: Create kind cluster with custom name
+        uses: ./
+        with:
+          kubectl_version: "v1.24.6"
+          ignore_failed_clean: true
+
+      - name: Test
+        run: |
+          kubectl cluster-info
+          kubectl get nodes
