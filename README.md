@@ -21,7 +21,7 @@ For more information on inputs, see the [API Documentation](https://developer.gi
 - `cluster_name`: The name of the cluster to create (default: `chart-testing`)
 - `wait`: The duration to wait for the control plane to become ready (default: `60s`)
 - `verbosity`: info log verbosity, higher value produces more output
-- `kubectl_version`: The kubectl version to use (default: v1.23.12)
+- `kubectl_version`: The kubectl version to use (default: v1.25.5)
 - `install_only`: Skips cluster creation, only install kind (default: false)
 
 ### Example Workflow
