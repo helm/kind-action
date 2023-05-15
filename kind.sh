@@ -18,9 +18,9 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-DEFAULT_KIND_VERSION=v0.17.0
+DEFAULT_KIND_VERSION=v0.18.0
 DEFAULT_CLUSTER_NAME=chart-testing
-DEFAULT_KUBECTL_VERSION=v1.25.5
+DEFAULT_KUBECTL_VERSION=v1.26.4
 
 show_help() {
 cat << EOF
