@@ -34,6 +34,10 @@ inputs:
   install_only:
     description: "Skips cluster creation, only install kind (default: false)"
     required: false
+  ignore_failed_clean:
+    description: "Whether to ignore the post-delete the cluster (default: false)"
+    default: false
+    required: false
 runs:
   using: "node16"
   main: "main.js"
