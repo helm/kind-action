@@ -56,14 +56,27 @@ main() {
         exit 1
     fi
 
-    local arch
-    case $(uname -m) in
-        i386)               arch="386" ;;
-        i686)               arch="386" ;;
-        x86_64)             arch="amd64" ;;
-        arm|aarch64|arm64)  arch="arm64" ;;
+    local os="linux"
+    case $(uname) in
+        Darwin) os="darwin" ;;
     esac
-    local cache_dir="${RUNNER_TOOL_CACHE}/kind/${version}/${arch}"
+
+    local arch
+    if [[ "$os" == "darwin" ]]; then
+        case $(uname -m) in
+            x86_64)         arch="amd64" ;;
+            arm|arm64)      arch="arm64" ;;
+        esac
+    else
+        case $(uname -m) in
+            i386)               arch="386" ;;
+            i686)               arch="386" ;;
+            x86_64)             arch="amd64" ;;
+            arm|aarch64|arm64)  arch="arm64" ;;
+        esac
+    fi
+    
+    local cache_dir="${RUNNER_TOOL_CACHE}/kind/${version}/${os}/${arch}"
 
     local kind_dir="${cache_dir}/kind/bin/"
     if [[ ! -x "${kind_dir}/kind" ]]; then
@@ -188,7 +201,7 @@ install_kind() {
 
     mkdir -p "${kind_dir}"
 
-    curl -sSLo "${kind_dir}/kind" "https://github.com/kubernetes-sigs/kind/releases/download/${version}/kind-linux-${arch}"
+    curl -sSLo "${kind_dir}/kind" "https://github.com/kubernetes-sigs/kind/releases/download/${version}/kind-${os}-${arch}"
     chmod +x "${kind_dir}/kind"
 }
 
@@ -197,7 +210,7 @@ install_kubectl() {
 
     mkdir -p "${kubectl_dir}"
 
-    curl -sSLo "${kubectl_dir}/kubectl" "https://storage.googleapis.com/kubernetes-release/release/${kubectl_version}/bin/linux/${arch}/kubectl"
+    curl -sSLo "${kubectl_dir}/kubectl" "https://storage.googleapis.com/kubernetes-release/release/${kubectl_version}/bin/${os}/${arch}/kubectl"
     chmod +x "${kubectl_dir}/kubectl"
 }
 
