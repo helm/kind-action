@@ -18,9 +18,9 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-DEFAULT_KIND_VERSION=v0.19.0
+DEFAULT_KIND_VERSION=v0.20.0
 DEFAULT_CLUSTER_NAME=chart-testing
-DEFAULT_KUBECTL_VERSION=v1.26.4
+DEFAULT_KUBECTL_VERSION=v1.26.6
 
 show_help() {
 cat << EOF
@@ -40,19 +40,19 @@ EOF
 }
 
 main() {
-    local version="$DEFAULT_KIND_VERSION"
+    local version="${DEFAULT_KIND_VERSION}"
     local config=
     local node_image=
-    local cluster_name="$DEFAULT_CLUSTER_NAME"
+    local cluster_name="${DEFAULT_CLUSTER_NAME}"
     local wait=60s
     local verbosity=
-    local kubectl_version="$DEFAULT_KUBECTL_VERSION"
+    local kubectl_version="${DEFAULT_KUBECTL_VERSION}"
     local install_only=false
 
     parse_command_line "$@"
 
-    if [[ ! -d "$RUNNER_TOOL_CACHE" ]]; then
-        echo "Cache directory '$RUNNER_TOOL_CACHE' does not exist" >&2
+    if [[ ! -d "${RUNNER_TOOL_CACHE}" ]]; then
+        echo "Cache directory '${RUNNER_TOOL_CACHE}' does not exist" >&2
         exit 1
     fi
 
@@ -63,28 +63,28 @@ main() {
         x86_64)         arch="amd64" ;;
         arm|aarch64)    dpkg --print-architecture | grep -q "arm64" && arch="arm64" || arch="arm" ;;
     esac
-    local cache_dir="$RUNNER_TOOL_CACHE/kind/$version/$arch"
+    local cache_dir="${RUNNER_TOOL_CACHE}/kind/${version}/${arch}"
 
-    local kind_dir="$cache_dir/kind/bin/"
-    if [[ ! -x "$kind_dir/kind" ]]; then
+    local kind_dir="${cache_dir}/kind/bin/"
+    if [[ ! -x "${kind_dir}/kind" ]]; then
         install_kind
     fi
 
     echo 'Adding kind directory to PATH...'
-    echo "$kind_dir" >> "$GITHUB_PATH"
+    echo "${kind_dir}" >> "${GITHUB_PATH}"
 
-    local kubectl_dir="$cache_dir/kubectl/bin/"
-    if [[ ! -x "$kubectl_dir/kubectl" ]]; then
+    local kubectl_dir="${cache_dir}/kubectl/bin/"
+    if [[ ! -x "${kubectl_dir}/kubectl" ]]; then
         install_kubectl
     fi
 
     echo 'Adding kubectl directory to PATH...'
-    echo "$kubectl_dir" >> "$GITHUB_PATH"
+    echo "${kubectl_dir}" >> "${GITHUB_PATH}"
 
-    "$kind_dir/kind" version
-    "$kubectl_dir/kubectl" version --client=true
+    "${kind_dir}/kind" version
+    "${kubectl_dir}/kubectl" version --client=true
 
-    if [[ "$install_only" == false ]]; then
+    if [[ "${install_only}" == false ]]; then
       create_kind_cluster
     fi
 }
@@ -186,38 +186,38 @@ parse_command_line() {
 install_kind() {
     echo 'Installing kind...'
 
-    mkdir -p "$kind_dir"
+    mkdir -p "${kind_dir}"
 
-    curl -sSLo "$kind_dir/kind" "https://github.com/kubernetes-sigs/kind/releases/download/$version/kind-linux-$arch"
-    chmod +x "$kind_dir/kind"
+    curl -sSLo "${kind_dir}/kind" "https://github.com/kubernetes-sigs/kind/releases/download/${version}/kind-linux-${arch}"
+    chmod +x "${kind_dir}/kind"
 }
 
 install_kubectl() {
     echo 'Installing kubectl...'
 
-    mkdir -p "$kubectl_dir"
+    mkdir -p "${kubectl_dir}"
 
-    curl -sSLo "$kubectl_dir/kubectl" "https://storage.googleapis.com/kubernetes-release/release/$kubectl_version/bin/linux/$arch/kubectl"
-    chmod +x "$kubectl_dir/kubectl"
+    curl -sSLo "${kubectl_dir}/kubectl" "https://storage.googleapis.com/kubernetes-release/release/${kubectl_version}/bin/linux/${arch}/kubectl"
+    chmod +x "${kubectl_dir}/kubectl"
 }
 
 create_kind_cluster() {
     echo 'Creating kind cluster...'
-    local args=(create cluster "--name=$cluster_name" "--wait=$wait")
+    local args=(create cluster "--name=${cluster_name}" "--wait=${wait}")
 
-    if [[ -n "$node_image" ]]; then
-        args+=("--image=$node_image")
+    if [[ -n "${node_image}" ]]; then
+        args+=("--image=${node_image}")
     fi
 
-    if [[ -n "$config" ]]; then
-        args+=("--config=$config")
+    if [[ -n "${config}" ]]; then
+        args+=("--config=${config}")
     fi
 
-    if [[ -n "$verbosity" ]]; then
-        args+=("--verbosity=$verbosity")
+    if [[ -n "${verbosity}" ]]; then
+        args+=("--verbosity=${verbosity}")
     fi
 
-    "$kind_dir/kind" "${args[@]}"
+    "${kind_dir}/kind" "${args[@]}"
 }
 
 main "$@"

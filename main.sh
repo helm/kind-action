@@ -55,7 +55,7 @@ main() {
         args+=(--install-only)
     fi
 
-    "$SCRIPT_DIR/kind.sh" ${args[@]+"${args[@]}"}
+    "${SCRIPT_DIR}/kind.sh" ${args[@]+"${args[@]}"}
 }
 
 main
