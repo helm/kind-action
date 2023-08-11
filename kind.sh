@@ -58,10 +58,10 @@ main() {
 
     local arch
     case $(uname -m) in
-        i386)           arch="386" ;;
-        i686)           arch="386" ;;
-        x86_64)         arch="amd64" ;;
-        arm|aarch64)    dpkg --print-architecture | grep -q "arm64" && arch="arm64" || arch="arm" ;;
+        i386)               arch="386" ;;
+        i686)               arch="386" ;;
+        x86_64)             arch="amd64" ;;
+        arm|aarch64|arm64)  arch="arm64" ;;
     esac
     local cache_dir="${RUNNER_TOOL_CACHE}/kind/${version}/${arch}"
 
