@@ -39,11 +39,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Create k8s Kind Cluster
-        uses: helm/kind-action@v1.5.0
+        uses: helm/kind-action@v1
 ```
 
-This uses [@helm/kind-action](https://www.github.com/helm/kind-action) GitHub Action to spin up a [kind](https://kind.sigs.k8s.io/) Kubernetes cluster on every Pull Request.
-See [@helm/chart-testing-action](https://www.github.com/helm/chart-testing-action) for a more practical example.
+This uses [@helm/kind-action](https://github.com/helm/kind-action) GitHub Action to spin up a [kind](https://kind.sigs.k8s.io/) Kubernetes cluster on every Pull Request.
+See [@helm/chart-testing-action](https://github.com/helm/chart-testing-action) for a more practical example.
 
 ## Code of conduct
 
