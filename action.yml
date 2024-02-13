@@ -6,9 +6,9 @@ branding:
   icon: box
 inputs:
   version:
-    description: "The kind version to use (default: v0.20.0)"
+    description: "The kind version to use (default: v0.21.0)"
     required: false
-    default: "v0.20.0"
+    default: "v0.21.0"
   config:
     description: "The path to the kind config file"
     required: false
@@ -28,9 +28,9 @@ inputs:
     default: "0"
     required: false
   kubectl_version:
-    description: "The kubectl version to use (default: v1.26.4)"
+    description: "The kubectl version to use (default: v1.28.6)"
     required: false
-    default: "v1.26.4"
+    default: "v1.28.6"
   install_only:
     description: "Skips cluster creation, only install kind (default: false)"
     required: false
