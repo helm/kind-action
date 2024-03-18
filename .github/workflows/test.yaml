@@ -68,6 +68,22 @@ jobs:
       - name: Test kind works and there is no cluster started
         run: |
           [[ $(kind get clusters | wc -l) -eq 0 ]]
+          
+  test-with-macos-install-only:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+      - name: Only install kind without starting a cluster
+        uses: ./
+        with:
+          install_only: true
+          ignore_failed_clean: true
+
+      - name: Test kind works and there is no cluster started
+        run: |
+          [[ $(kind get clusters | wc -l) -eq 0 ]]
 
   test-with-custom-kubectl-version:
     runs-on: ubuntu-latest
