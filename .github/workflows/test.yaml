@@ -69,6 +69,23 @@ jobs:
         run: |
           [[ $(kind get clusters | wc -l) -eq 0 ]]
 
+  test-with-custom-kind-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
+
+      - name: Create kind cluster with custom name
+        uses: ./
+        with:
+          version: "v0.21.0"
+
+      - name: Test
+        run: |
+          kind version
+          kubectl cluster-info
+          kubectl get nodes
+
   test-with-custom-kubectl-version:
     runs-on: ubuntu-latest
     steps:
@@ -78,7 +95,7 @@ jobs:
       - name: Create kind cluster with custom name
         uses: ./
         with:
-          kubectl_version: "v1.27.1"
+          kubectl_version: "v1.29.3"
 
       - name: Test
         run: |
@@ -110,7 +127,7 @@ jobs:
       - name: Create kind cluster with custom name
         uses: ./
         with:
-          kubectl_version: "v1.24.6"
+          kubectl_version: "v1.29.3"
           ignore_failed_clean: true
 
       - name: Test

@@ -18,9 +18,9 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-DEFAULT_KIND_VERSION=v0.21.0
+DEFAULT_KIND_VERSION=v0.22.0
 DEFAULT_CLUSTER_NAME=chart-testing
-DEFAULT_KUBECTL_VERSION=v1.28.6
+DEFAULT_KUBECTL_VERSION=v1.29.3
 
 show_help() {
 cat << EOF
@@ -62,6 +62,7 @@ main() {
         i686)               arch="386" ;;
         x86_64)             arch="amd64" ;;
         arm|aarch64|arm64)  arch="arm64" ;;
+        *) exit 1 ;;
     esac
     local cache_dir="${RUNNER_TOOL_CACHE}/kind/${version}/${arch}"
 
@@ -188,8 +189,14 @@ install_kind() {
 
     mkdir -p "${kind_dir}"
 
-    curl -sSLo "${kind_dir}/kind" "https://github.com/kubernetes-sigs/kind/releases/download/${version}/kind-linux-${arch}"
-    chmod +x "${kind_dir}/kind"
+    pushd "${kind_dir}"
+    wget --quiet "https://github.com/kubernetes-sigs/kind/releases/download/${version}/kind-linux-${arch}"
+    wget --quiet "https://github.com/kubernetes-sigs/kind/releases/download/${version}/kind-linux-${arch}.sha256sum"
+    grep "kind-linux-${arch}" < "kind-linux-${arch}.sha256sum" | sha256sum -c
+    mv "kind-linux-${arch}" kind
+    rm -f "kind-linux-${arch}.sha256sum"
+    chmod +x kind
+    popd
 }
 
 install_kubectl() {
