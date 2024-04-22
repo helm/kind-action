@@ -6,9 +6,9 @@ branding:
   icon: box
 inputs:
   version:
-    description: "The kind version to use (default: v0.21.0)"
+    description: "The kind version to use (default: v0.22.0)"
     required: false
-    default: "v0.21.0"
+    default: "v0.22.0"
   config:
     description: "The path to the kind config file"
     required: false
@@ -28,15 +28,15 @@ inputs:
     default: "0"
     required: false
   kubectl_version:
-    description: "The kubectl version to use (default: v1.28.6)"
+    description: "The kubectl version to use (default: v1.29.3)"
     required: false
-    default: "v1.28.6"
+    default: "v1.29.3"
   install_only:
     description: "Skips cluster creation, only install kind (default: false)"
     required: false
   ignore_failed_clean:
     description: "Whether to ignore the post-delete the cluster (default: false)"
-    default: false
+    default: "false"
     required: false
 runs:
   using: "node20"
