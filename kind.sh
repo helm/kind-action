@@ -190,8 +190,8 @@ install_kind() {
     mkdir -p "${kind_dir}"
 
     pushd "${kind_dir}"
-    wget --quiet "https://github.com/kubernetes-sigs/kind/releases/download/${version}/kind-linux-${arch}"
-    wget --quiet "https://github.com/kubernetes-sigs/kind/releases/download/${version}/kind-linux-${arch}.sha256sum"
+    curl -sSLo "kind-linux-${arch}" "https://github.com/kubernetes-sigs/kind/releases/download/${version}/kind-linux-${arch}"
+    curl -sSLo "kind-linux-${arch}.sha256sum" "https://github.com/kubernetes-sigs/kind/releases/download/${version}/kind-linux-${arch}.sha256sum"
     grep "kind-linux-${arch}" < "kind-linux-${arch}.sha256sum" | sha256sum -c
     mv "kind-linux-${arch}" kind
     rm -f "kind-linux-${arch}.sha256sum"
