@@ -36,6 +36,7 @@ Usage: $(basename "$0") <options>
     -l, --verbosity                         info log verbosity, higher value produces more output
     -k, --kubectl-version                   The kubectl version to use (default: $DEFAULT_KUBECTL_VERSION)
     -o, --install-only                      Skips cluster creation, only install kind (default: false)
+        --with-registry                     Enables registry config dir for the cluster (default: false)
 
 EOF
 }
@@ -50,6 +51,8 @@ main() {
     local verbosity=
     local kubectl_version="${DEFAULT_KUBECTL_VERSION}"
     local install_only=false
+    local with_registry=false
+    local config_with_registry_path="/etc/kind-registry/config.yaml"
 
     parse_command_line "$@"
 
@@ -187,6 +190,14 @@ parse_command_line() {
                     install_only=true
                 fi
                 ;;
+            --with-registry)
+                if [[ -n "${2:-}" ]]; then
+                    with_registry="$2"
+                    shift
+                else
+                    with_registry=true
+                fi
+                ;;
             *)
                 break
                 ;;
@@ -220,6 +231,20 @@ install_kubectl() {
     chmod +x "${kubectl_dir}/kubectl"
 }
 
+create_config_with_registry() {
+    sudo mkdir -p $(dirname "$config_with_registry_path")
+    cat <<EOF | sudo tee  "$config_with_registry_path"
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+containerdConfigPatches:
+- |-
+  [plugins."io.containerd.grpc.v1.cri".registry]
+    config_path = "/etc/containerd/certs.d"
+
+EOF
+    sudo chmod a+r "$config_with_registry_path"
+}
+
 create_kind_cluster() {
     echo 'Creating kind cluster...'
     local args=(create cluster "--name=${cluster_name}" "--wait=${wait}")
@@ -238,6 +263,15 @@ create_kind_cluster() {
 
     if [[ -n "${verbosity}" ]]; then
         args+=("--verbosity=${verbosity}")
+    fi
+
+    if [[ "${with_registry}" == true ]]; then
+        if [[ -n "${config}" ]]; then
+            echo 'WARNING: when using the "config" option, you need to manually configure the registry in the provided configurations'
+        else
+            create_config_with_registry
+            args+=(--config "$config_with_registry_path")
+        fi
     fi
 
     "${kind_dir}/kind" "${args[@]}"
