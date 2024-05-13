@@ -53,7 +53,7 @@ jobs:
           registry_enable_delete: true
 ```
 
-This will configure the cluster with an insecure local registry at `my-registry:5001` on both the host and within cluster.
+This will configure the cluster with an insecure local registry at `my-registry:5001` on both the host and within cluster. Subsequent steps can refer to the registry address with the environment variable `LOCAL_REGISTRY` (i.e. `my-registry:5001`).
 
 **Note**: If `config` option is used, you must manually configure the cluster with registry config dir enabled at `/etc/containerd/certs.d`. For example:
 
