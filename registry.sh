@@ -129,8 +129,8 @@ create_registry() {
     # Local registry is available at $registry_name:$registry_port
     echo "127.0.0.1 $registry_name" | sudo tee -a /etc/hosts
 
-    # Export environment variable for subsequent steps
-    echo "LOCAL_REGISTRY=$registry_name:$registry_port" >> "$GITHUB_ENV"
+    # Write registry address to output for subsequent steps
+    echo "LOCAL_REGISTRY=$registry_name:$registry_port" >> "$GITHUB_OUTPUT"
 }
 
 connect_registry() {
