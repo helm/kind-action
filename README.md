@@ -32,7 +32,7 @@ For more information on inputs, see the [API Documentation](https://developer.gi
 
 ## Configuring Local Registry
 
-Create a workflow (eg: .github/workflows/create-cluster-with-registry.yml):
+Create a workflow (eg: `.github/workflows/create-cluster-with-registry.yml`):
 
 
 ```yaml
