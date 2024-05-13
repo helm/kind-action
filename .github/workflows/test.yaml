@@ -214,13 +214,11 @@ jobs:
               exit 1
             fi
 
-            local_reg=custom-registry:5001
-
             docker pull busybox
-            docker tag busybox $local_reg/localbusybox
-            docker push $local_reg/localbusybox
+            docker tag busybox $LOCAL_REGISTRY/localbusybox
+            docker push $LOCAL_REGISTRY/localbusybox
 
-            kubectl create job test --image=$local_reg/localbusybox
+            kubectl create job test --image=$LOCAL_REGISTRY/localbusybox
             kubectl wait --for=condition=complete --timeout=30s job/test
 
   test-with-registry-and-delete-enabled:
@@ -247,13 +245,11 @@ jobs:
               exit 1
             fi
 
-            local_reg=custom-registry:5001
-
             docker pull busybox
-            docker tag busybox $local_reg/localbusybox
+            docker tag busybox $LOCAL_REGISTRY/localbusybox
             
-            DIGEST=$(docker push $local_reg/localbusybox | grep -oE 'sha256:\w+')
+            DIGEST=$(docker push $LOCAL_REGISTRY/localbusybox | grep -oE 'sha256:\w+')
             
-            curl -X DELETE custom-registry:5001/v2/localbusybox/manifests/$DIGEST
-            [[ "$(curl -Ls custom-registry:5001/v2/localbusybox/tags/list | jq .tags)" == null ]]
+            curl -X DELETE $LOCAL_REGISTRY/v2/localbusybox/manifests/$DIGEST
+            [[ "$(curl -Ls $LOCAL_REGISTRY/v2/localbusybox/tags/list | jq .tags)" == null ]]
             
