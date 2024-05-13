@@ -30,42 +30,6 @@ For more information on inputs, see the [API Documentation](https://developer.gi
 - `install_only`: Skips cluster creation, only install kind (default: false)
 - `ignore_failed_clean`: Whether to ignore the post delete cluster action failing (default: false)
 
-## Configuring Local Registry
-
-Create a workflow (eg: `.github/workflows/create-cluster-with-registry.yml`):
-
-
-```yaml
-name: Create Cluster with Registry
-
-on: pull_request
-
-jobs:
-  create-cluster-with-registry:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Kubernetes KinD Cluster
-        uses: helm/kind-action@v1
-        with:
-          registry: true
-          registry_name: my-registry
-          registry_port: 5001
-          registry_enable_delete: true
-```
-
-This will configure the cluster with an insecure local registry at `my-registry:5001` on both the host and within cluster. Subsequent steps can refer to the registry address with the environment variable `LOCAL_REGISTRY` (i.e. `my-registry:5001`).
-
-**Note**: If `config` option is used, you must manually configure the cluster with registry config dir enabled at `/etc/containerd/certs.d`. For example:
-
-```yaml
-kind: Cluster
-apiVersion: kind.x-k8s.io/v1alpha4
-containerdConfigPatches:
-- |-
-  [plugins."io.containerd.grpc.v1.cri".registry]
-    config_path = "/etc/containerd/certs.d"
-```
-
 ### Example Workflow
 
 Create a workflow (eg: `.github/workflows/create-cluster.yml`):
@@ -85,6 +49,43 @@ jobs:
 
 This uses [@helm/kind-action](https://github.com/helm/kind-action) GitHub Action to spin up a [kind](https://kind.sigs.k8s.io/) Kubernetes cluster on every Pull Request.
 See [@helm/chart-testing-action](https://github.com/helm/chart-testing-action) for a more practical example.
+
+### Configuring Local Registry
+
+Create a workflow (eg: `.github/workflows/create-cluster-with-registry.yml`):
+
+
+```yaml
+name: Create Cluster with Registry
+
+on: pull_request
+
+jobs:
+  create-cluster-with-registry:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Kubernetes KinD Cluster
+        id: kind
+        uses: helm/kind-action@v1
+        with:
+          registry: true
+          registry_name: my-registry
+          registry_port: 5001
+          registry_enable_delete: true
+```
+
+This will configure the cluster with an insecure local registry at `my-registry:5001` on both the host and within cluster. Subsequent steps can refer to the registry address with the output of the kind setup step (i.e. `${{ steps.kind.outputs.LOCAL_REGISTRY }}`).
+
+**Note**: If `config` option is used, you must manually configure the cluster nodes with registry config dir enabled at `/etc/containerd/certs.d`. For example:
+
+```yaml
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+containerdConfigPatches:
+- |-
+  [plugins."io.containerd.grpc.v1.cri".registry]
+    config_path = "/etc/containerd/certs.d"
+```
 
 ## Code of conduct
 
