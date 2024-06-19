@@ -31,6 +31,26 @@ inputs:
     description: "The kubectl version to use (default: v1.29.3)"
     required: false
     default: "v1.29.3"
+  registry:
+    description: "Whether to configure an insecure local registry (default: false)"
+    required: false
+    default: "false"
+  registry_image:
+    description: "The registry image to use (default: registry:2)"
+    required: false
+    default: "registry:2"
+  registry_name:
+    description: "The registry name to use (default: kind-registry)"
+    required: false
+    default: "kind-registry"
+  registry_port:
+    description: "The local port used to bind the registry (default: 5000)"
+    required: false
+    default: "5000"
+  registry_enable_delete:
+    description: "Enable delete operations on the registry (default: false)"
+    required: false
+    default: "false"
   install_only:
     description: "Skips cluster creation, only install kind (default: false)"
     required: false

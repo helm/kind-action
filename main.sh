@@ -21,7 +21,8 @@ set -o pipefail
 SCRIPT_DIR=$(dirname -- "$(readlink -f "${BASH_SOURCE[0]}" || realpath "${BASH_SOURCE[0]}")")
 
 main() {
-    args=()
+    local args=()
+    local registry_args=()
 
     if [[ -n "${INPUT_VERSION:-}" ]]; then
         args+=(--version "${INPUT_VERSION}")
@@ -37,6 +38,7 @@ main() {
 
     if [[ -n "${INPUT_CLUSTER_NAME:-}" ]]; then
         args+=(--cluster-name "${INPUT_CLUSTER_NAME}")
+        registry_args+=(--cluster-name "${INPUT_CLUSTER_NAME}")
     fi
 
     if [[ -n "${INPUT_WAIT:-}" ]]; then
@@ -55,7 +57,31 @@ main() {
         args+=(--install-only)
     fi
 
+    if [[ -n "${INPUT_REGISTRY:-}" ]]; then
+        args+=(--with-registry "${INPUT_REGISTRY}")
+    fi
+
+    if [[ -n "${INPUT_REGISTRY_IMAGE:-}" ]]; then
+        registry_args+=(--registry-image "${INPUT_REGISTRY_IMAGE}")
+    fi
+
+    if [[ -n "${INPUT_REGISTRY_NAME:-}" ]]; then
+        registry_args+=(--registry-name "${INPUT_REGISTRY_NAME}")
+    fi
+
+    if [[ -n "${INPUT_REGISTRY_PORT:-}" ]]; then
+        registry_args+=(--registry-port "${INPUT_REGISTRY_PORT}")
+    fi
+
+    if [[ -n "${INPUT_REGISTRY_ENABLE_DELETE:-}" ]]; then
+        registry_args+=(--enable-delete "${INPUT_REGISTRY_ENABLE_DELETE}")
+    fi
+
     "${SCRIPT_DIR}/kind.sh" ${args[@]+"${args[@]}"}
+
+    if [[ "${INPUT_REGISTRY:-}" == true ]]; then
+        "${SCRIPT_DIR}/registry.sh" "${registry_args[@]}"
+    fi
 }
 
 main

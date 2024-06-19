@@ -19,16 +19,14 @@ set -o nounset
 set -o pipefail
 
 DEFAULT_CLUSTER_NAME=chart-testing
+DEFAULT_REGISTRY_NAME=kind-registry
 
 main() {
-    args=()
+    args=(--name "${INPUT_CLUSTER_NAME:-$DEFAULT_CLUSTER_NAME}")
+    registry_args=("${INPUT_REGISTRY_NAME:-$DEFAULT_REGISTRY_NAME}")
 
-    if [[ -n "${INPUT_CLUSTER_NAME:-}" ]]; then
-        args+=(--name "${INPUT_CLUSTER_NAME}")
-    else
-        args+=(--name "${DEFAULT_CLUSTER_NAME}")
-    fi
-
+    docker rm -f "${registry_args[@]}" || "${INPUT_IGNORE_FAILED_CLEAN}"
+    
     kind delete cluster "${args[@]}" || "${INPUT_IGNORE_FAILED_CLEAN}"
 }
 

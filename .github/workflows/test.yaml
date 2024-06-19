@@ -151,3 +151,93 @@ jobs:
         run: |
           kubectl cluster-info
           kubectl get nodes
+
+  test-without-registry:
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout
+          uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
+
+        - name: Create kind cluster without registry
+          uses: ./
+          with:
+            registry: false
+
+        - name: Test
+          run: |
+            kubectl cluster-info
+            kubectl get storageclass standard
+
+            if [[ -n "$(docker ps --filter "name=kind-registry" --format "{{.ID}}")" ]]; then
+              echo "Registry is present"
+              exit 1
+            fi
+
+  test-with-registry:
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout
+          uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
+
+        - name: Create kind cluster with registry
+          id: kind
+          uses: ./
+          with:
+            registry: true
+            registry_name: custom-registry
+            registry_port: 5001
+
+        - name: Test
+          env:
+            LOCAL_REGISTRY: ${{ steps.kind.outputs.LOCAL_REGISTRY }}
+          run: |
+            kubectl cluster-info
+            kubectl get storageclass standard
+
+            if [[ -z "$(docker ps --filter "name=custom-registry" --format "{{.ID}}")" ]]; then
+              echo "Registry is not present"
+              exit 1
+            fi
+
+            docker pull busybox
+            docker tag busybox $LOCAL_REGISTRY/localbusybox
+            docker push $LOCAL_REGISTRY/localbusybox
+
+            kubectl create job test --image=$LOCAL_REGISTRY/localbusybox
+            kubectl wait --for=condition=complete --timeout=30s job/test
+
+  test-with-registry-and-delete-enabled:
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout
+          uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
+
+        - name: Create kind cluster with registry and delete enabled
+          id: kind
+          uses: ./
+          with:
+            registry: true
+            registry_name: custom-registry
+            registry_port: 5001
+            registry_enable_delete: true
+
+        - name: Test
+          env:
+            LOCAL_REGISTRY: ${{ steps.kind.outputs.LOCAL_REGISTRY }}
+          run: |
+            kubectl cluster-info
+            kubectl get storageclass standard
+
+            if [[ -z "$(docker ps --filter "name=custom-registry" --format "{{.ID}}")" ]]; then
+              echo "Registry is not present"
+              exit 1
+            fi
+
+            docker pull busybox
+            docker tag busybox $LOCAL_REGISTRY/localbusybox
+            
+            DIGEST=$(docker push $LOCAL_REGISTRY/localbusybox | grep -oE 'sha256:\w+')
+            
+            curl -X DELETE $LOCAL_REGISTRY/v2/localbusybox/manifests/$DIGEST
+            [[ "$(curl -Ls $LOCAL_REGISTRY/v2/localbusybox/tags/list | jq .tags)" == null ]]
+            
