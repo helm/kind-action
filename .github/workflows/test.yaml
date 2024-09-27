@@ -103,6 +103,24 @@ jobs:
           kubectl cluster-info
           kubectl get nodes
 
+  test-with-custom-kubeconfig:
+    runs-on: ubuntu-latest
+    env:
+      KUBECONFIG: "./kubeconfig"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+
+      - name: Create kind cluster with custom kubeconfig
+        uses: ./
+        with:
+          kubeconfig: "${{ env.KUBECONFIG }}"
+          cluster_name: "kube-config-test"
+
+      - name: Test
+        run: |
+          grep "kube-config-test" ${KUBECONFIG}
+
   test-with-custom-kubectl-version:
     runs-on: ubuntu-latest
     steps:

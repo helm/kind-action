@@ -29,6 +29,7 @@ Usage: $(basename "$0") <options>
         --help                              Display help
     -v, --version                           The kind version to use (default: $DEFAULT_KIND_VERSION)
     -c, --config                            The path to the kind config file
+    -K, --kubeconfig                        The path to the kubeconfig config file
     -i, --node-image                        The Docker image for the cluster nodes
     -n, --cluster-name                      The name of the cluster to create (default: chart-testing)
     -w, --wait                              The duration to wait for the control plane to become ready (default: 60s)
@@ -42,6 +43,7 @@ EOF
 main() {
     local version="${DEFAULT_KIND_VERSION}"
     local config=
+    local kubeconfig=
     local node_image=
     local cluster_name="${DEFAULT_CLUSTER_NAME}"
     local wait=60s
@@ -113,6 +115,16 @@ parse_command_line() {
                     shift
                 else
                     echo "ERROR: '--config' cannot be empty." >&2
+                    show_help
+                    exit 1
+                fi
+                ;;
+            -K|--kubeconfig)
+                if [[ -n "${2:-}" ]]; then
+                    kubeconfig="$2"
+                    shift
+                else
+                    echo "ERROR: '--kubeconfig' cannot be empty." >&2
                     show_help
                     exit 1
                 fi
@@ -218,6 +230,10 @@ create_kind_cluster() {
 
     if [[ -n "${config}" ]]; then
         args+=("--config=${config}")
+    fi
+
+    if [[ -n "${kubeconfig}" ]]; then
+        args+=("--kubeconfig=${kubeconfig}")
     fi
 
     if [[ -n "${verbosity}" ]]; then

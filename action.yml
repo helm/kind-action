@@ -12,6 +12,9 @@ inputs:
   config:
     description: "The path to the kind config file"
     required: false
+  kubeconfig:
+    description: "The path to the kubeconfig config file"
+    required: false
   node_image:
     description: "The Docker image for the cluster nodes"
     required: false
