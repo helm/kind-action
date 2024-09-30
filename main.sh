@@ -31,6 +31,10 @@ main() {
         args+=(--config "${INPUT_CONFIG}")
     fi
 
+    if [[ -n "${INPUT_KUBECONFIG:-}" ]]; then
+        args+=(--kubeconfig "${INPUT_KUBECONFIG}")
+    fi
+
     if [[ -n "${INPUT_NODE_IMAGE:-}" ]]; then
         args+=(--node-image "${INPUT_NODE_IMAGE}")
     fi
