@@ -227,8 +227,12 @@ install_kubectl() {
 
     mkdir -p "${kubectl_dir}"
 
-    curl -sSLo "${kubectl_dir}/kubectl" "https://dl.k8s.io/release/${kubectl_version}/bin/linux/${arch}/kubectl"
-    chmod +x "${kubectl_dir}/kubectl"
+    pushd "${kubectl_dir}"
+    curl -sSLo kubectl "https://dl.k8s.io/release/${kubectl_version}/bin/linux/${arch}/kubectl"
+    curl -sSLo kubectl.sha256 "https://dl.k8s.io/release/${kubectl_version}/bin/linux/${arch}/kubectl.sha256"
+    echo "$(cat kubectl.sha256) kubectl" | sha256sum -c
+    chmod +x kubectl
+    popd
 }
 
 create_config_with_registry() {
