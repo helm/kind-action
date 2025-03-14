@@ -29,6 +29,7 @@ For more information on inputs, see the [API Documentation](https://developer.gi
 - `registry_enable_delete`: Enable delete operations on the registry (default: false)
 - `install_only`: Skips cluster creation, only install kind (default: false)
 - `ignore_failed_clean`: Whether to ignore the post delete cluster action failing (default: false)
+- `cloud_provider`: Whether to use cloud provider loadbalancer (default: false)
 
 ### Example Workflow
 

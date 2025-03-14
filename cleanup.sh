@@ -25,6 +25,13 @@ main() {
     args=(--name "${INPUT_CLUSTER_NAME:-$DEFAULT_CLUSTER_NAME}")
     registry_args=("${INPUT_REGISTRY_NAME:-$DEFAULT_REGISTRY_NAME}")
 
+    if [[ "${INPUT_CLOUD_PROVIDER:-false}" == true ]]; then
+        rm -f /usr/local/bin/cloud-provider-kind || true
+        rm -rf cloud-provider-kind || true
+        rm -f /tmp/cloud-provider.log || true
+        rm -f cloud-provider-kind_*_checksums.txt || true
+    fi
+
     docker rm -f "${registry_args[@]}" || "${INPUT_IGNORE_FAILED_CLEAN}"
     
     kind delete cluster "${args[@]}" || "${INPUT_IGNORE_FAILED_CLEAN}"

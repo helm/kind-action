@@ -21,6 +21,7 @@ set -o pipefail
 DEFAULT_KIND_VERSION=v0.26.0
 DEFAULT_CLUSTER_NAME=chart-testing
 DEFAULT_KUBECTL_VERSION=v1.31.4
+DEFAULT_CLOUD_PROVIDER_KIND_VERSION=0.6.0
 
 show_help() {
 cat << EOF
@@ -37,6 +38,7 @@ Usage: $(basename "$0") <options>
     -k, --kubectl-version                   The kubectl version to use (default: $DEFAULT_KUBECTL_VERSION)
     -o, --install-only                      Skips cluster creation, only install kind (default: false)
         --with-registry                     Enables registry config dir for the cluster (default: false)
+        --cloud-provider                    Enables cloud provider for the cluster (default: false)
 
 EOF
 }
@@ -53,6 +55,7 @@ main() {
     local install_only=false
     local with_registry=false
     local config_with_registry_path="/etc/kind-registry/config.yaml"
+    local cloud_provider=
 
     parse_command_line "$@"
 
@@ -198,6 +201,14 @@ parse_command_line() {
                     with_registry=true
                 fi
                 ;;
+            --cloud-provider)
+                if [[ -n "${2:-}" ]]; then
+                    cloud_provider="$2"
+                    shift
+                else
+                    cloud_provider=true
+                fi
+                ;;
             *)
                 break
                 ;;
@@ -245,6 +256,25 @@ EOF
     sudo chmod a+r "$config_with_registry_path"
 }
 
+install_cloud_provider(){
+    echo "Setting up cloud-provider-kind..."
+    curl -sSLo cloud-provider-kind_${DEFAULT_CLOUD_PROVIDER_KIND_VERSION}_linux_amd64.tar.gz https://github.com/kubernetes-sigs/cloud-provider-kind/releases/download/v${DEFAULT_CLOUD_PROVIDER_KIND_VERSION}/cloud-provider-kind_${DEFAULT_CLOUD_PROVIDER_KIND_VERSION}_linux_amd64.tar.gz > /dev/null 2>&1
+    curl -sSLo cloud-provider-kind_${DEFAULT_CLOUD_PROVIDER_KIND_VERSION}_checksums.txt https://github.com/kubernetes-sigs/cloud-provider-kind/releases/download/v${DEFAULT_CLOUD_PROVIDER_KIND_VERSION}/cloud-provider-kind_${DEFAULT_CLOUD_PROVIDER_KIND_VERSION}_checksums.txt
+
+    grep "cloud-provider-kind_${DEFAULT_CLOUD_PROVIDER_KIND_VERSION}_linux_amd64.tar.gz" < "cloud-provider-kind_${DEFAULT_CLOUD_PROVIDER_KIND_VERSION}_checksums.txt" | sha256sum -c
+
+    mkdir -p cloud-provider-kind-tmp
+    tar -xzf cloud-provider-kind_${DEFAULT_CLOUD_PROVIDER_KIND_VERSION}_linux_amd64.tar.gz -C cloud-provider-kind-tmp
+    chmod +x cloud-provider-kind-tmp/cloud-provider-kind
+    sudo mv cloud-provider-kind-tmp/cloud-provider-kind /usr/local/bin/
+    rm -rf cloud-provider-kind-tmp cloud-provider-kind_${DEFAULT_CLOUD_PROVIDER_KIND_VERSION}_linux_amd64.tar.gz
+
+    echo "cloud-provider-kind set up successfully ✅"
+
+    cloud-provider-kind > /tmp/cloud-provider.log 2>&1 &
+    echo "cloud-provider-kind started ✅"
+}
+
 create_kind_cluster() {
     echo 'Creating kind cluster...'
     local args=(create cluster "--name=${cluster_name}" "--wait=${wait}")
@@ -272,6 +302,10 @@ create_kind_cluster() {
             create_config_with_registry
             args+=(--config "$config_with_registry_path")
         fi
+    fi
+
+    if [[ "${cloud_provider}" == true ]]; then
+        install_cloud_provider
     fi
 
     "${kind_dir}/kind" "${args[@]}"

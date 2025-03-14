@@ -258,4 +258,23 @@ jobs:
             
             curl -X DELETE $LOCAL_REGISTRY/v2/localbusybox/manifests/$DIGEST
             [[ "$(curl -Ls $LOCAL_REGISTRY/v2/localbusybox/tags/list | jq .tags)" == null ]]
-            
+
+  test-with-cloud-provider-enabled:
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout
+          uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+        - name: Create kind cluster with cloud provider
+          uses: ./
+          with:
+            cloud_provider: true
+
+        - name: Test
+          run: |
+            if ps aux | grep -v grep | grep cloud-provider-kind; then
+              echo "Cloud provider is present."
+            else
+              echo "Cloud provider is not present."
+              exit 1
+            fi        
