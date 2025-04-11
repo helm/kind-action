@@ -26,7 +26,7 @@ main() {
     registry_args=("${INPUT_REGISTRY_NAME:-$DEFAULT_REGISTRY_NAME}")
 
     docker rm -f "${registry_args[@]}" || "${INPUT_IGNORE_FAILED_CLEAN}"
-    
+
     kind delete cluster "${args[@]}" || "${INPUT_IGNORE_FAILED_CLEAN}"
 }
 
