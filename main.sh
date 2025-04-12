@@ -81,6 +81,10 @@ main() {
         registry_args+=(--enable-delete "${INPUT_REGISTRY_ENABLE_DELETE}")
     fi
 
+    if [[ -n "${INPUT_CLOUD_PROVIDER:-}" ]]; then
+        args+=(--cloud-provider "${INPUT_CLOUD_PROVIDER}")
+    fi
+
     "${SCRIPT_DIR}/kind.sh" ${args[@]+"${args[@]}"}
 
     if [[ "${INPUT_REGISTRY:-}" == true ]]; then

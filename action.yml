@@ -61,6 +61,10 @@ inputs:
     description: "Whether to ignore the post-delete the cluster (default: false)"
     default: "false"
     required: false
+  cloud_provider:
+    description: "Whether to use cloud provider loadbalancer (default: false)"
+    required: false
+    default: "false"
 runs:
   using: "node20"
   main: "main.js"
