@@ -147,7 +147,7 @@ config_registry_for_nodes() {
     fi
 
     # Reference: https://github.com/containerd/containerd/blob/main/docs/hosts.md
-    REGISTRY_DIR="/etc/containerd/certs.d/${registry_name}:${registry_port}"
+    REGISTRY_DIR="/etc/containerd/certs.d/localhost:${registry_port}"
 
     for node in $(kind get nodes -n "${cluster_name}"); do
         docker exec "${node}" mkdir -p "${REGISTRY_DIR}"
@@ -169,7 +169,7 @@ metadata:
   namespace: kube-public
 data:
   localRegistryHosting.v1: |
-    host: "${registry_name}:${registry_port}"
+    host: "localhost:${registry_port}"
     hostFromClusterNetwork: "${registry_name}:${registry_port}"
     help: "https://kind.sigs.k8s.io/docs/user/local-registry/"
 
