@@ -29,7 +29,7 @@ Usage: $(basename "$0") <options>
 
         --help                              Display help
     -v, --version                           The kind version to use (default: $DEFAULT_KIND_VERSION)
-    -c, --config                            The path to the kind config file
+    -c, --config                            The path to the kind config file or inlined config
     -K, --kubeconfig                        The path to the kubeconfig config file
     -i, --node-image                        The Docker image for the cluster nodes
     -n, --cluster-name                      The name of the cluster to create (default: chart-testing)
@@ -246,6 +246,19 @@ install_kubectl() {
     popd
 }
 
+handle_config_content() {
+    local config_input="$1"
+
+    if [[ ! -f "$config_input" ]]; then
+        local temp_config_file
+        temp_config_file=$(mktemp --suffix=.yaml)
+        echo "$config_input" > "$temp_config_file"
+        echo "$temp_config_file"
+    else
+        echo "$config_input"
+    fi
+}
+
 create_config_with_registry() {
     sudo mkdir -p $(dirname "$config_with_registry_path")
     cat <<EOF | sudo tee  "$config_with_registry_path"
@@ -282,13 +295,19 @@ install_cloud_provider(){
 create_kind_cluster() {
     echo 'Creating kind cluster...'
     local args=(create cluster "--name=${cluster_name}" "--wait=${wait}")
+    local actual_config_file=""
 
     if [[ -n "${node_image}" ]]; then
         args+=("--image=${node_image}")
     fi
 
     if [[ -n "${config}" ]]; then
-        args+=("--config=${config}")
+        actual_config_file=$(handle_config_content "$config")
+        args+=("--config=${actual_config_file}")
+
+        if [[ -n "${actual_config_file}" && "${actual_config_file}" != "${config}" ]]; then
+            trap "rm -f '${actual_config_file}'" EXIT
+        fi
     fi
 
     if [[ -n "${kubeconfig}" ]]; then

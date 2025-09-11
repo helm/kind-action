@@ -10,7 +10,7 @@ inputs:
     required: false
     default: "v0.29.0"
   config:
-    description: "The path to the kind config file"
+    description: "The path to the kind config file or inlined config"
     required: false
   kubeconfig:
     description: "The path to the kubeconfig config file"

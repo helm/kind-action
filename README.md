@@ -16,7 +16,7 @@ For more information, reference the GitHub Help Documentation for [Creating a wo
 For more information on inputs, see the [API Documentation](https://developer.github.com/v3/repos/releases/#input)
 
 - `version`: The kind version to use (default: `v0.29.0`)
-- `config`: The path to the kind config file
+- `config`: The path to the kind config file or inlined config
 - `node_image`: The Docker image for the cluster nodes
 - `cluster_name`: The name of the cluster to create (default: `chart-testing`)
 - `wait`: The duration to wait for the control plane to become ready (default: `60s`)
