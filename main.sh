@@ -58,7 +58,7 @@ main() {
     fi
 
     if [[ -n "${INPUT_INSTALL_ONLY:-}" ]]; then
-        args+=(--install-only)
+        args+=(--install-only "${INPUT_INSTALL_ONLY}")
     fi
 
     if [[ -n "${INPUT_REGISTRY:-}" ]]; then
