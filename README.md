@@ -91,3 +91,4 @@ containerdConfigPatches:
 ## Code of conduct
 
 Participation in the Helm community is governed by the [Code of Conduct](CODE_OF_CONDUCT.md).
+
