@@ -65,6 +65,32 @@ inputs:
     description: "Whether to use cloud provider loadbalancer (default: false)"
     required: false
     default: "false"
+  kyverno_namespace:
+    description: "Kyverno namespace (default: kyverno)"
+    required: false
+    default: "kyverno"
+  kyverno_policy_path:
+    description: "Path to Kyverno policies (default: k8s-clusters/services/common/module/policies)"
+    required: false
+    default: "k8s-clusters/services/common/module/policies"
+  app_namespace:
+    description: "Namespace for bl-k8s-secrets (default: bl-k8s)"
+    required: false
+    default: "bl-k8s"
+  secret_name:
+    description: "Name for bl-k8s-secrets (default: bl-k8s-secrets)"
+    required: false
+    default: "bl-k8s-secrets"
+  oidc_user:
+    description: "OIDC user for pulling images from Artifactory"
+    required: true
+  oidc_token:
+    description: "OIDC token for pulling images from Artifactory"
+    required: true
+  config_descriptor_key:
+    description: "Config descriptor key for bl-k8s-secrets"
+    required: true
+    
 runs:
   using: "node20"
   main: "main.js"

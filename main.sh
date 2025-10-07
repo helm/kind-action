@@ -23,6 +23,7 @@ SCRIPT_DIR=$(dirname -- "$(readlink -f "${BASH_SOURCE[0]}" || realpath "${BASH_S
 main() {
     local args=()
     local registry_args=()
+    post_kind_args=()
 
     if [[ -n "${INPUT_VERSION:-}" ]]; then
         args+=(--version "${INPUT_VERSION}")
@@ -43,6 +44,7 @@ main() {
     if [[ -n "${INPUT_CLUSTER_NAME:-}" ]]; then
         args+=(--cluster-name "${INPUT_CLUSTER_NAME}")
         registry_args+=(--cluster-name "${INPUT_CLUSTER_NAME}")
+        post_kind_args+=(--cluster-name "${INPUT_CLUSTER_NAME}")
     fi
 
     if [[ -n "${INPUT_WAIT:-}" ]]; then
@@ -84,6 +86,36 @@ main() {
     if [[ -n "${INPUT_CLOUD_PROVIDER:-}" ]]; then
         args+=(--cloud-provider "${INPUT_CLOUD_PROVIDER}")
     fi
+
+    if [[ -n "${INPUT_KYVERNO_NAMESPACE:-}" ]]; then
+        args+=(--kyverno-namespace "${INPUT_KYVERNO_NAMESPACE}")
+    fi
+
+    if [[ -n "${INPUT_KYVERNO_POLICY_PATH:-}" ]]; then
+        args+=(--kyverno-policy-path "${INPUT_KYVERNO_POLICY_PATH}")
+    fi
+
+    if [[ -n "${INPUT_APP_NAMESPACE:-}" ]]; then
+        args+=(--app-namespace "${INPUT_APP_NAMESPACE}")
+    fi
+    
+    if [[ -n "${INPUT_SECRET_NAME:-}" ]]; then
+        args+=(--secret-name "${INPUT_SECRET_NAME}")
+    fi
+
+    if [[ -n "${INPUT_OIDC_USER:-}" ]]; then
+        args+=(--oidc-user "${INPUT_OIDC_USER}")
+    fi
+
+    if [[ -n "${INPUT_OIDC_TOKEN:-}" ]]; then
+        args+=(--oidc-token "${INPUT_OIDC_TOKEN}")
+    fi
+    if [[ -n "${INPUT_CONFIG_DESCRIPTOR_KEY:-}" ]]; then
+        echo "CONFIG_DESCRIPTOR_KEY: ${INPUT_CONFIG_DESCRIPTOR_KEY}"
+        args+=(--config-descriptor-key "${INPUT_CONFIG_DESCRIPTOR_KEY}")
+    fi
+
+
 
     "${SCRIPT_DIR}/kind.sh" ${args[@]+"${args[@]}"}
 

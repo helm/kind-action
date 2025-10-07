@@ -39,7 +39,13 @@ Usage: $(basename "$0") <options>
     -o, --install-only                      Skips cluster creation, only install kind (default: false)
         --with-registry                     Enables registry config dir for the cluster (default: false)
         --cloud-provider                    Enables cloud provider for the cluster (default: false)
-
+        --app-namespace                     Namespace for bl-k8s-app (default: bl-k8s)
+        --kyverno-namespace                 Kyverno namespace (default: kyverno)
+        --kyverno-policy-path               Path to Kyverno policies (default: k8s-clusters/services/common/module/policies)
+        --secret-name                       Name for bl-k8s-secrets (default: bl-k8s-secrets)
+        --oidc-user                         OIDC user for pulling images from Artifactory
+        --oidc-token                        OIDC token for pulling images from Artifactory
+        --config-descriptor-key             Config descriptor key for bl-k8s-secrets
 EOF
 }
 
@@ -56,6 +62,11 @@ main() {
     local with_registry=false
     local config_with_registry_path="/etc/kind-registry/config.yaml"
     local cloud_provider=
+    local CLUSTER_NAME="chart-testing"
+    local KYVERNO_NAMESPACE="kyverno"
+    local KYVERNO_POLICY_PATH="k8s-clusters/services/common/module/policies"
+    local APP_NAMESPACE="bl-k8s"
+    local SECRET_NAME="bl-k8s-secrets"
 
     parse_command_line "$@"
 
@@ -89,12 +100,18 @@ main() {
 
     echo 'Adding kubectl directory to PATH...'
     echo "${kubectl_dir}" >> "${GITHUB_PATH}"
-
+     
     "${kind_dir}/kind" version
     "${kubectl_dir}/kubectl" version --client=true
 
-    if [[ "${install_only}" == false ]]; then
+    if [[ "${install_only}" == true ]]; then
       create_kind_cluster
+    else
+        create_kind_cluster
+        copy_docker_creds
+        setup_kyverno
+        apply_kyverno_policies
+        create_bl_k8s_secret
     fi
 }
 
@@ -105,7 +122,7 @@ parse_command_line() {
                 show_help
                 exit
                 ;;
-            --version)
+            -v|--version)
                 if [[ -n "${2:-}" ]]; then
                     version="$2"
                     shift
@@ -165,12 +182,12 @@ parse_command_line() {
                     exit 1
                 fi
                 ;;
-            -v|--verbosity)
+            -l|--verbosity)
                 if [[ -n "${2:-}" ]]; then
                     verbosity="$2"
                     shift
                 else
-                    echo "ERROR: '--verbosity' cannot be empty." >&2
+                    echo "ERROR: '-l|--verbosity' cannot be empty." >&2
                     show_help
                     exit 1
                 fi
@@ -190,7 +207,7 @@ parse_command_line() {
                     install_only="$2"
                     shift
                 else
-                    install_only=true
+                    install_only=false
                 fi
                 ;;
             --with-registry)
@@ -209,11 +226,80 @@ parse_command_line() {
                     cloud_provider=true
                 fi
                 ;;
+            --app-namespace)
+                if [[ -n "${2:-}" ]]; then
+                    APP_NAMESPACE="$2"
+                    shift
+                else
+                    echo "ERROR: '--app-namespace' cannot be empty." >&2
+                    show_help
+                    exit 1
+                fi
+                ;;
+            --kyverno-namespace|-N)
+                if [[ -n "${2:-}" ]]; then
+                    KYVERNO_NAMESPACE="$2"
+                    shift
+                else
+                    echo "ERROR: '--kyverno-namespace' cannot be empty." >&2
+                    show_help
+                    exit 1
+                fi
+                ;;
+            --kyverno-policy-path|-p)
+                if [[ -n "${2:-}" ]]; then
+                    KYVERNO_POLICY_PATH="$2"
+                    shift
+                else
+                    echo "ERROR: '--kyverno-policy-path' cannot be empty." >&2
+                    show_help
+                    exit 1
+                fi
+                ;;
+            --secret-name|-s)
+                if [[ -n "${2:-}" ]]; then
+                    SECRET_NAME="$2"
+                    shift
+                else
+                    echo "ERROR: '--secret-name' cannot be empty." >&2
+                    show_help
+                    exit 1
+                fi
+                ;;
+            --oidc-user|-u)
+                if [[ -n "${2:-}" ]]; then
+                    OIDC_USER="$2"
+                    shift
+                else
+                    echo "ERROR: '--oidc-user' cannot be empty." >&2
+                    show_help
+                    exit 1
+                fi
+                ;;
+            --oidc-token|-t)
+                if [[ -n "${2:-}" ]]; then
+                    OIDC_TOKEN="$2"
+                    shift
+                else
+                    echo "ERROR: '--oidc-token' cannot be empty." >&2
+                    show_help
+                    exit 1
+                fi
+                ;;
+            --config-descriptor-key|-d)
+                if [[ -n "${2:-}" ]]; then
+                    CONFIG_DESCRIPTOR_KEY="$2"
+                    shift
+                else
+                    echo "ERROR: '--config-descriptor-key' cannot be empty." >&2
+                    show_help
+                    exit 1
+                fi
+                ;;
             *)
                 break
                 ;;
         esac
-
         shift
     done
 }
@@ -314,5 +400,48 @@ create_kind_cluster() {
 
     "${kind_dir}/kind" "${args[@]}"
 }
+
+copy_docker_creds() {
+    echo "🔑 Copying Docker credentials to KinD nodes..."
+    docker login paymentology.jfrog.io -u "${OIDC_USER}" -p "${OIDC_TOKEN}"
+    for node in $("${kind_dir}/kind" get nodes --name "${cluster_name}"); do
+        docker cp $HOME/.docker/config.json $node:/var/lib/kubelet/config.json
+    done
+    echo "✅ Docker credentials copied."
+}
+
+setup_kyverno() {
+    echo "📦 Adding Kyverno Helm repository and updating..."
+    helm repo add kyverno https://kyverno.github.io/kyverno/
+    helm repo update
+    echo "🚀 Installing Kyverno in namespace '${KYVERNO_NAMESPACE}'..."
+    helm install kyverno kyverno/kyverno --namespace "${KYVERNO_NAMESPACE}" --create-namespace
+    echo "✅ Kyverno installed."
+}
+
+apply_kyverno_policies() {
+    echo "📜 Applying Kyverno policies from '${KYVERNO_POLICY_PATH}'..."
+    kubectl apply -f "${KYVERNO_POLICY_PATH}"
+    echo "✅ Kyverno policies applied."
+}
+
+create_bl_k8s_secret() {
+    echo "🔐 Creating secret '${SECRET_NAME}' in namespace '${APP_NAMESPACE}'..."
+    kubectl create namespace "${APP_NAMESPACE}" --dry-run=client -o yaml | kubectl apply -f -
+    
+    if [[ -z "${CONFIG_DESCRIPTOR_KEY:-}" ]]; then
+        echo "ERROR: CONFIG_DESCRIPTOR_KEY is not set!"
+        exit 1
+    else
+        echo "Using CONFIG_DESCRIPTOR_KEY: ${CONFIG_DESCRIPTOR_KEY}"
+    fi
+    
+    
+    kubectl create secret generic "${SECRET_NAME}" \
+      --from-literal=configDescriptorKey="${CONFIG_DESCRIPTOR_KEY}" \
+      -n "${APP_NAMESPACE}" -o yaml | kubectl apply -f -
+    echo "✅ Secret '${SECRET_NAME}' created."
+}
+
 
 main "$@"
