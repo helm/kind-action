@@ -33,7 +33,7 @@ main() {
     fi
 
     docker rm -f "${registry_args[@]}" || "${INPUT_IGNORE_FAILED_CLEAN}"
-    
+
     kind delete cluster "${args[@]}" || "${INPUT_IGNORE_FAILED_CLEAN}"
 }
 

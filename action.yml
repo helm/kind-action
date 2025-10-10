@@ -6,9 +6,9 @@ branding:
   icon: box
 inputs:
   version:
-    description: "The kind version to use (default: v0.29.0)"
+    description: "The kind version to use (default: v0.30.0)"
     required: false
-    default: "v0.29.0"
+    default: "v0.30.0"
   config:
     description: "The path to the kind config file"
     required: false
@@ -31,9 +31,9 @@ inputs:
     default: "0"
     required: false
   kubectl_version:
-    description: "The kubectl version to use (default: v1.31.11)"
+    description: "The kubectl version to use (default: v1.34.0)"
     required: false
-    default: "v1.31.11"
+    default: "v1.34.0"
   registry:
     description: "Whether to configure an insecure local registry (default: false)"
     required: false
@@ -66,6 +66,6 @@ inputs:
     required: false
     default: "false"
 runs:
-  using: "node20"
+  using: "node24"
   main: "main.js"
   post: "cleanup.js"

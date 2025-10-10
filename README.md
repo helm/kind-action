@@ -15,21 +15,21 @@ For more information, reference the GitHub Help Documentation for [Creating a wo
 
 For more information on inputs, see the [API Documentation](https://developer.github.com/v3/repos/releases/#input)
 
-- `version`: The kind version to use (default: `v0.29.0`)
+- `version`: The kind version to use (default: `v0.30.0`)
 - `config`: The path to the kind config file
 - `node_image`: The Docker image for the cluster nodes
 - `cluster_name`: The name of the cluster to create (default: `chart-testing`)
 - `wait`: The duration to wait for the control plane to become ready (default: `60s`)
 - `verbosity`: info log verbosity, higher value produces more output
-- `kubectl_version`: The kubectl version to use (default: v1.30.4)
-- `registry`: Whether to configure an insecure local registry (default: false)
-- `registry_image`: The registry image to use (default: registry:2)
-- `registry_name`: The registry name to use (default: kind-registry)
-- `registry_port`: The local port used to bind the registry (default: 5000)
-- `registry_enable_delete`: Enable delete operations on the registry (default: false)
-- `install_only`: Skips cluster creation, only install kind (default: false)
-- `ignore_failed_clean`: Whether to ignore the post delete cluster action failing (default: false)
-- `cloud_provider`: Whether to use cloud provider loadbalancer (default: false)
+- `kubectl_version`: The kubectl version to use (default: `v1.34.0`)
+- `registry`: Whether to configure an insecure local registry (default: `false`)
+- `registry_image`: The registry image to use (default: `registry:2`)
+- `registry_name`: The registry name to use (default: `kind-registry`)
+- `registry_port`: The local port used to bind the registry (default: `5000`)
+- `registry_enable_delete`: Enable delete operations on the registry (default: `false`)
+- `install_only`: Skips cluster creation, only install kind (default: `false`)
+- `ignore_failed_clean`: Whether to ignore the post delete cluster action failing (default: `false`)
+- `cloud_provider`: Whether to use cloud provider loadbalancer (default: `false`)
 
 ### Example Workflow
 

@@ -87,7 +87,7 @@ parse_command_line() {
                     echo "ERROR: '-p|--registry-port' cannot be empty." >&2
                     show_help
                     exit 1
-                fi            
+                fi
                 ;;
             -d|--enable-delete)
                 if [[ -n "${2:-}" ]]; then
@@ -95,7 +95,7 @@ parse_command_line() {
                     shift
                 else
                     enable_delete=true
-                fi           
+                fi
                 ;;
             --cluster-name)
                 if [[ -n "${2:-}" ]]; then
