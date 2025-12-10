@@ -34,6 +34,10 @@ inputs:
     description: "The kubectl version to use (default: v1.34.0)"
     required: false
     default: "v1.34.0"
+  skip_kubectl_install:
+    description: "Skip kubectl installation (default: false)"
+    required: false
+    default: "false"
   registry:
     description: "Whether to configure an insecure local registry (default: false)"
     required: false

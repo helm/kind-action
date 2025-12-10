@@ -57,6 +57,10 @@ main() {
         args+=(--kubectl-version "${INPUT_KUBECTL_VERSION}")
     fi
 
+    if [[ -n "${INPUT_SKIP_KUBECTL_INSTALL:-}" ]]; then
+        args+=(--skip-kubectl-install "${INPUT_SKIP_KUBECTL_INSTALL}")
+    fi
+
     if [[ -n "${INPUT_INSTALL_ONLY:-}" ]]; then
         args+=(--install-only "${INPUT_INSTALL_ONLY}")
     fi

@@ -36,6 +36,7 @@ Usage: $(basename "$0") <options>
     -w, --wait                              The duration to wait for the control plane to become ready (default: 60s)
     -l, --verbosity                         info log verbosity, higher value produces more output
     -k, --kubectl-version                   The kubectl version to use (default: $DEFAULT_KUBECTL_VERSION)
+        --skip-kubectl-install              Skip kubectl installation (default: false)
     -o, --install-only                      Skips cluster creation, only install kind (default: false)
         --with-registry                     Enables registry config dir for the cluster (default: false)
         --cloud-provider                    Enables cloud provider for the cluster (default: false)
@@ -52,6 +53,7 @@ main() {
     local wait=60s
     local verbosity=
     local kubectl_version="${DEFAULT_KUBECTL_VERSION}"
+    local skip_kubectl_install=false
     local install_only=false
     local with_registry=false
     local config_with_registry_path="/etc/kind-registry/config.yaml"
@@ -82,16 +84,21 @@ main() {
     echo 'Adding kind directory to PATH...'
     echo "${kind_dir}" >> "${GITHUB_PATH}"
 
-    local kubectl_dir="${cache_dir}/kubectl/bin/"
-    if [[ ! -x "${kubectl_dir}/kubectl" ]]; then
-        install_kubectl
+    if [[ "${skip_kubectl_install}" == false ]]; then
+        local kubectl_dir="${cache_dir}/kubectl/bin/"
+        if [[ ! -x "${kubectl_dir}/kubectl" ]]; then
+            install_kubectl
+        fi
+
+        echo 'Adding kubectl directory to PATH...'
+        echo "${kubectl_dir}" >> "${GITHUB_PATH}"
+
+        "${kubectl_dir}/kubectl" version --client=true
+    else
+        echo 'Skipping kubectl installation...'
     fi
 
-    echo 'Adding kubectl directory to PATH...'
-    echo "${kubectl_dir}" >> "${GITHUB_PATH}"
-
     "${kind_dir}/kind" version
-    "${kubectl_dir}/kubectl" version --client=true
 
     if [[ "${install_only}" == false ]]; then
       create_kind_cluster
@@ -183,6 +190,14 @@ parse_command_line() {
                     echo "ERROR: '-k|--kubectl-version' cannot be empty." >&2
                     show_help
                     exit 1
+                fi
+                ;;
+            --skip-kubectl-install)
+                if [[ -n "${2:-}" ]]; then
+                    skip_kubectl_install="$2"
+                    shift
+                else
+                    skip_kubectl_install=true
                 fi
                 ;;
             -o|--install-only)
