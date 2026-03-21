@@ -416,3 +416,51 @@ jobs:
               echo "Cloud provider is not present."
               exit 1
             fi
+
+  test-install-only-macos:
+    runs-on: macos-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install kind and kubectl without creating a cluster
+        uses: ./
+        with:
+          install_only: true
+
+      - name: Verify kind and kubectl are installed
+        run: |
+          kind version
+          kubectl version --client=true
+
+  test-install-only-windows:
+    runs-on: windows-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install kind and kubectl without creating a cluster
+        uses: ./
+        with:
+          install_only: true
+          # kind stopped publishing Windows binaries from v0.33.0 onwards,
+          # so pin to the last release that ships a Windows binary.
+          version: v0.32.0
+
+      - name: Verify kind and kubectl are installed
+        shell: bash
+        run: |
+          kind version
+          kubectl version --client=true
