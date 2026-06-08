@@ -122,7 +122,8 @@ create_registry() {
     docker run -d --restart=always \
         --name "${registry_name}" \
         --network bridge \
-        -p "${registry_port}:5000" \
+        -p "${registry_port}:${registry_port}" \
+        -e REGISTRY_HTTP_ADDR="0.0.0.0:${registry_port}" \
         -e REGISTRY_STORAGE_DELETE_ENABLED="$enable_delete" \
         $registry_image
 
@@ -152,7 +153,7 @@ config_registry_for_nodes() {
     for node in $(kind get nodes -n "${cluster_name}"); do
         docker exec "${node}" mkdir -p "${REGISTRY_DIR}"
         cat <<EOF | docker exec -i "${node}" cp /dev/stdin "${REGISTRY_DIR}/hosts.toml"
-[host."http://${registry_name}:5000"]
+[host."http://${registry_name}:${registry_port}"]
 EOF
     done
 }
