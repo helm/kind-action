@@ -64,6 +64,19 @@ main() {
         exit 1
     fi
 
+    local os
+    case $(uname -s) in
+        Linux)  os="linux" ;;
+        Darwin) os="darwin" ;;
+        CYGWIN*|MINGW*|MSYS*) os="windows" ;;
+        *) echo "Unsupported OS" >&2; exit 1 ;;
+    esac
+
+    local binary_ext=""
+    if [[ "${os}" == "windows" ]]; then
+        binary_ext=".exe"
+    fi
+
     local arch
     case $(uname -m) in
         i386)               arch="386" ;;
@@ -75,7 +88,7 @@ main() {
     local cache_dir="${RUNNER_TOOL_CACHE}/kind/${version}/${arch}"
 
     local kind_dir="${cache_dir}/kind/bin/"
-    if [[ ! -x "${kind_dir}/kind" ]]; then
+    if [[ ! -x "${kind_dir}/kind${binary_ext}" ]]; then
         install_kind
     fi
 
@@ -83,15 +96,15 @@ main() {
     echo "${kind_dir}" >> "${GITHUB_PATH}"
 
     local kubectl_dir="${cache_dir}/kubectl/bin/"
-    if [[ ! -x "${kubectl_dir}/kubectl" ]]; then
+    if [[ ! -x "${kubectl_dir}/kubectl${binary_ext}" ]]; then
         install_kubectl
     fi
 
     echo 'Adding kubectl directory to PATH...'
     echo "${kubectl_dir}" >> "${GITHUB_PATH}"
 
-    "${kind_dir}/kind" version
-    "${kubectl_dir}/kubectl" version --client=true
+    "${kind_dir}/kind${binary_ext}" version
+    "${kubectl_dir}/kubectl${binary_ext}" version --client=true
 
     if [[ "${install_only}" == false ]]; then
       create_kind_cluster
@@ -222,28 +235,91 @@ install_kind() {
     echo 'Installing kind...'
 
     mkdir -p "${kind_dir}"
+    pushd "${kind_dir}" > /dev/null
 
-    pushd "${kind_dir}"
-    curl -sSLo "kind-linux-${arch}" "https://github.com/kubernetes-sigs/kind/releases/download/${version}/kind-linux-${arch}"
-    curl -sSLo "kind-linux-${arch}.sha256sum" "https://github.com/kubernetes-sigs/kind/releases/download/${version}/kind-linux-${arch}.sha256sum"
-    grep "kind-linux-${arch}" < "kind-linux-${arch}.sha256sum" | sha256sum -c
-    mv "kind-linux-${arch}" kind
-    rm -f "kind-linux-${arch}.sha256sum"
-    chmod +x kind
-    popd
+    local binary_name="kind-${os}-${arch}"
+    
+    # Download Binary
+    curl -sSLo "${binary_name}" "https://github.com/kubernetes-sigs/kind/releases/download/${version}/${binary_name}"
+    
+    # Download Checksum
+    curl -sSLo "${binary_name}.sha256sum" "https://github.com/kubernetes-sigs/kind/releases/download/${version}/${binary_name}.sha256sum"
+    
+    # Verify Checksum
+    local sum_cmd="sha256sum"
+    if ! command -v sha256sum &> /dev/null; then
+        if command -v shasum &> /dev/null; then
+            sum_cmd="shasum -a 256"
+        else
+            echo "Error: No checksum tool found" >&2; exit 1
+        fi
+    fi
+    
+    local expected_sum
+    expected_sum=$(awk '{print $1}' "${binary_name}.sha256sum")
+    
+    local actual_sum
+    actual_sum=$($sum_cmd "${binary_name}" | awk '{print $1}')
+
+    if [[ "${expected_sum}" != "${actual_sum}" ]]; then
+        echo "Checksum verification failed!" >&2
+        exit 1
+    fi
+
+    # Install
+    if [[ "${os}" == "windows" ]]; then
+        mv "${binary_name}" kind.exe
+    else
+        mv "${binary_name}" kind
+        chmod +x kind
+    fi
+    
+    rm -f "${binary_name}.sha256sum"
+    popd > /dev/null
 }
 
 install_kubectl() {
     echo 'Installing kubectl...'
 
     mkdir -p "${kubectl_dir}"
+    pushd "${kubectl_dir}" > /dev/null
+    
+    local kubectl_filename="kubectl"
+    local url_os="${os}"
+    
+    if [[ "${os}" == "windows" ]]; then
+        kubectl_filename="kubectl.exe"
+    fi
 
-    pushd "${kubectl_dir}"
-    curl -sSLo kubectl "https://dl.k8s.io/release/${kubectl_version}/bin/linux/${arch}/kubectl"
-    curl -sSLo kubectl.sha256 "https://dl.k8s.io/release/${kubectl_version}/bin/linux/${arch}/kubectl.sha256"
-    echo "$(cat kubectl.sha256) kubectl" | sha256sum -c
-    chmod +x kubectl
-    popd
+    local url="https://dl.k8s.io/release/${kubectl_version}/bin/${url_os}/${arch}/${kubectl_filename}"
+    
+    curl -sSLo "${kubectl_filename}" "${url}"
+    curl -sSLo "${kubectl_filename}.sha256" "${url}.sha256"
+    
+    local sum_cmd="sha256sum"
+    if ! command -v sha256sum &> /dev/null; then
+        if command -v shasum &> /dev/null; then
+            sum_cmd="shasum -a 256"
+        else
+            echo "Error: No checksum tool found" >&2; exit 1
+        fi
+    fi
+    
+    local expected_sum
+    expected_sum=$(awk '{print $1}' "${kubectl_filename}.sha256")
+    
+    local actual_sum
+    actual_sum=$($sum_cmd "${kubectl_filename}" | awk '{print $1}')
+
+    if [[ "${expected_sum}" != "${actual_sum}" ]]; then
+        echo "Checksum verification failed!" >&2
+        exit 1
+    fi
+    
+    if [[ "${os}" != "windows" ]]; then
+        chmod +x kubectl
+    fi
+    popd > /dev/null
 }
 
 create_config_with_registry() {
@@ -312,7 +388,7 @@ create_kind_cluster() {
         install_cloud_provider
     fi
 
-    "${kind_dir}/kind" "${args[@]}"
+    "${kind_dir}/kind${binary_ext}" "${args[@]}"
 }
 
 main "$@"
