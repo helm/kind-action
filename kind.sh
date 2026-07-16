@@ -224,8 +224,8 @@ install_kind() {
     mkdir -p "${kind_dir}"
 
     pushd "${kind_dir}"
-    curl -sSLo "kind-linux-${arch}" "https://github.com/kubernetes-sigs/kind/releases/download/${version}/kind-linux-${arch}"
-    curl -sSLo "kind-linux-${arch}.sha256sum" "https://github.com/kubernetes-sigs/kind/releases/download/${version}/kind-linux-${arch}.sha256sum"
+    curl -sSL --retry 5 --retry-all-errors --retry-delay 5 -o "kind-linux-${arch}" "https://github.com/kubernetes-sigs/kind/releases/download/${version}/kind-linux-${arch}"
+    curl -sSL --retry 5 --retry-all-errors --retry-delay 5 -o "kind-linux-${arch}.sha256sum" "https://github.com/kubernetes-sigs/kind/releases/download/${version}/kind-linux-${arch}.sha256sum"
     grep "kind-linux-${arch}" < "kind-linux-${arch}.sha256sum" | sha256sum -c
     mv "kind-linux-${arch}" kind
     rm -f "kind-linux-${arch}.sha256sum"
@@ -239,8 +239,8 @@ install_kubectl() {
     mkdir -p "${kubectl_dir}"
 
     pushd "${kubectl_dir}"
-    curl -sSLo kubectl "https://dl.k8s.io/release/${kubectl_version}/bin/linux/${arch}/kubectl"
-    curl -sSLo kubectl.sha256 "https://dl.k8s.io/release/${kubectl_version}/bin/linux/${arch}/kubectl.sha256"
+    curl -sSL --retry 5 --retry-all-errors --retry-delay 5 -o kubectl "https://dl.k8s.io/release/${kubectl_version}/bin/linux/${arch}/kubectl"
+    curl -sSL --retry 5 --retry-all-errors --retry-delay 5 -o kubectl.sha256 "https://dl.k8s.io/release/${kubectl_version}/bin/linux/${arch}/kubectl.sha256"
     echo "$(cat kubectl.sha256) kubectl" | sha256sum -c
     chmod +x kubectl
     popd
@@ -262,8 +262,8 @@ EOF
 
 install_cloud_provider(){
     echo "Setting up cloud-provider-kind..."
-    curl -sSLo cloud-provider-kind_${DEFAULT_CLOUD_PROVIDER_KIND_VERSION}_linux_amd64.tar.gz https://github.com/kubernetes-sigs/cloud-provider-kind/releases/download/v${DEFAULT_CLOUD_PROVIDER_KIND_VERSION}/cloud-provider-kind_${DEFAULT_CLOUD_PROVIDER_KIND_VERSION}_linux_amd64.tar.gz > /dev/null 2>&1
-    curl -sSLo cloud-provider-kind_${DEFAULT_CLOUD_PROVIDER_KIND_VERSION}_checksums.txt https://github.com/kubernetes-sigs/cloud-provider-kind/releases/download/v${DEFAULT_CLOUD_PROVIDER_KIND_VERSION}/cloud-provider-kind_${DEFAULT_CLOUD_PROVIDER_KIND_VERSION}_checksums.txt
+    curl -sSL --retry 5 --retry-all-errors --retry-delay 5 -o cloud-provider-kind_${DEFAULT_CLOUD_PROVIDER_KIND_VERSION}_linux_amd64.tar.gz https://github.com/kubernetes-sigs/cloud-provider-kind/releases/download/v${DEFAULT_CLOUD_PROVIDER_KIND_VERSION}/cloud-provider-kind_${DEFAULT_CLOUD_PROVIDER_KIND_VERSION}_linux_amd64.tar.gz > /dev/null 2>&1
+    curl -sSL --retry 5 --retry-all-errors --retry-delay 5 -o cloud-provider-kind_${DEFAULT_CLOUD_PROVIDER_KIND_VERSION}_checksums.txt https://github.com/kubernetes-sigs/cloud-provider-kind/releases/download/v${DEFAULT_CLOUD_PROVIDER_KIND_VERSION}/cloud-provider-kind_${DEFAULT_CLOUD_PROVIDER_KIND_VERSION}_checksums.txt
 
     grep "cloud-provider-kind_${DEFAULT_CLOUD_PROVIDER_KIND_VERSION}_linux_amd64.tar.gz" < "cloud-provider-kind_${DEFAULT_CLOUD_PROVIDER_KIND_VERSION}_checksums.txt" | sha256sum -c
 
