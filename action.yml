@@ -9,6 +9,9 @@ inputs:
     description: "The kind version to use (default: v0.31.0)"
     required: false
     default: "v0.31.0"
+  version_file:
+    description: "The path to a file containing the kind version to use (asdf '.tool-versions' or a plain version file; the version is used as-is, e.g. v0.31.0). Takes precedence over 'version' when set."
+    required: false
   config:
     description: "The path to the kind config file"
     required: false

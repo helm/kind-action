@@ -20,9 +20,44 @@ set -o pipefail
 
 SCRIPT_DIR=$(dirname -- "$(readlink -f "${BASH_SOURCE[0]}" || realpath "${BASH_SOURCE[0]}")")
 
+# Resolve the kind version from a version file. Supports the asdf
+# '.tool-versions' format (a line such as "kind v0.31.0") as well as a plain
+# file that contains only the version string.
+resolve_version_from_file() {
+    local file="$1"
+    local version=""
+
+    if [[ ! -f "${file}" ]]; then
+        echo "ERROR: version_file '${file}' does not exist." >&2
+        exit 1
+    fi
+
+    # asdf '.tool-versions' format: a line such as "kind v0.31.0".
+    version=$(grep -E '^[[:space:]]*kind[[:space:]]+' "${file}" | head -n 1 | tr -d '\r' | awk '{print $2}') || true
+
+    # Otherwise treat the file as a plain version file (first token of the
+    # first non-empty, non-comment line).
+    if [[ -z "${version}" ]]; then
+        version=$(grep -vE '^[[:space:]]*(#|$)' "${file}" | head -n 1 | tr -d '\r' | awk '{print $1}') || true
+    fi
+
+    if [[ -z "${version}" ]]; then
+        echo "ERROR: no kind version found in version_file '${file}'." >&2
+        exit 1
+    fi
+
+    echo "${version}"
+}
+
 main() {
     local args=()
     local registry_args=()
+
+    # A version file takes precedence over the 'version' input when set.
+    if [[ -n "${INPUT_VERSION_FILE:-}" ]]; then
+        INPUT_VERSION="$(resolve_version_from_file "${INPUT_VERSION_FILE}")"
+        echo "Using kind version '${INPUT_VERSION}' from version_file '${INPUT_VERSION_FILE}'." >&2
+    fi
 
     if [[ -n "${INPUT_VERSION:-}" ]]; then
         args+=(--version "${INPUT_VERSION}")

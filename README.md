@@ -16,6 +16,7 @@ For more information, reference the GitHub Help Documentation for [Creating a wo
 For more information on inputs, see the [API Documentation](https://developer.github.com/v3/repos/releases/#input)
 
 - `version`: The kind version to use (default: `v0.31.0`)
+- `version_file`: The path to a file containing the kind version to use. Supports the asdf [`.tool-versions`](https://asdf-vm.com/manage/configuration.html#tool-versions) layout (the `kind` entry) and plain version files. The version is used as-is, so include the leading `v` (for example `kind v0.31.0`). Takes precedence over `version` when set.
 - `config`: The path to the kind config file
 - `node_image`: The Docker image for the cluster nodes
 - `cluster_name`: The name of the cluster to create (default: `chart-testing`)
