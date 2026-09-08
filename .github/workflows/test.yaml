@@ -140,6 +140,32 @@ jobs:
           kubectl cluster-info
           kubectl get nodes
 
+  test-with-version-file:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+
+      - name: Create version file
+        run: echo "kind v0.23.0" > .tool-versions
+
+      - name: Create kind cluster from version file
+        uses: ./
+        with:
+          version_file: ".tool-versions"
+
+      - name: Test
+        run: |
+          kind version | grep "v0.23.0"
+          kubectl cluster-info
+          kubectl get nodes
+
   test-with-custom-kubeconfig:
     runs-on: ubuntu-latest
 
