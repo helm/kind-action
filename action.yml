@@ -34,9 +34,9 @@ inputs:
     default: "0"
     required: false
   kubectl_version:
-    description: "The kubectl version to use (default: v1.37.0)"
+    description: "The kubectl version to use (default: v1.37.1)"
     required: false
-    default: "v1.37.0"
+    default: "v1.37.1"
   registry:
     description: "Whether to configure an insecure local registry (default: false)"
     required: false
