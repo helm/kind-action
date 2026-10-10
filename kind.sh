@@ -64,18 +64,31 @@ main() {
         exit 1
     fi
 
+    local os
+    case $(uname -s) in
+        Linux)  os="linux" ;;
+        Darwin) os="darwin" ;;
+        CYGWIN*|MINGW*|MSYS*) os="windows" ;;
+        *) echo "Unsupported OS" >&2; exit 1 ;;
+    esac
+
+    local binary_ext=""
+    if [[ "${os}" == "windows" ]]; then
+        binary_ext=".exe"
+    fi
+
     local arch
     case $(uname -m) in
-        i386)               arch="386" ;;
-        i686)               arch="386" ;;
-        x86_64)             arch="amd64" ;;
-        arm|aarch64|arm64)  arch="arm64" ;;
-        *) exit 1 ;;
+        i386|I386)                              arch="386" ;;
+        i686|I686)                              arch="386" ;;
+        x86_64|amd64|AMD64)                     arch="amd64" ;;
+        arm|aarch64|arm64|AARCH64|ARM64)        arch="arm64" ;;
+        *) echo "Unsupported architecture: $(uname -m)" >&2; exit 1 ;;
     esac
     local cache_dir="${RUNNER_TOOL_CACHE}/kind/${version}/${arch}"
 
     local kind_dir="${cache_dir}/kind/bin/"
-    if [[ ! -x "${kind_dir}/kind" ]]; then
+    if [[ ! -x "${kind_dir}/kind${binary_ext}" ]]; then
         install_kind
     fi
 
@@ -83,15 +96,15 @@ main() {
     echo "${kind_dir}" >> "${GITHUB_PATH}"
 
     local kubectl_dir="${cache_dir}/kubectl/bin/"
-    if [[ ! -x "${kubectl_dir}/kubectl" ]]; then
+    if [[ ! -x "${kubectl_dir}/kubectl${binary_ext}" ]]; then
         install_kubectl
     fi
 
     echo 'Adding kubectl directory to PATH...'
     echo "${kubectl_dir}" >> "${GITHUB_PATH}"
 
-    "${kind_dir}/kind" version
-    "${kubectl_dir}/kubectl" version --client=true
+    "${kind_dir}/kind${binary_ext}" version
+    "${kubectl_dir}/kubectl${binary_ext}" version --client=true
 
     if [[ "${install_only}" == false ]]; then
       create_kind_cluster
@@ -227,18 +240,52 @@ call_curl() {
     fi
 }
 
+verify_sha256() {
+    local file="$1"
+    local expected="$2"
+
+    local sum_cmd
+    if command -v sha256sum &> /dev/null; then
+        sum_cmd="sha256sum"
+    elif command -v shasum &> /dev/null; then
+        sum_cmd="shasum -a 256"
+    else
+        echo "Error: No checksum tool found (sha256sum or shasum)" >&2
+        exit 1
+    fi
+
+    local actual
+    actual=$($sum_cmd "${file}" | awk '{print $1}')
+
+    if [[ "${expected}" != "${actual}" ]]; then
+        echo "Checksum verification failed for ${file}!" >&2
+        exit 1
+    fi
+}
+
 install_kind() {
     echo 'Installing kind...'
 
     mkdir -p "${kind_dir}"
 
     pushd "${kind_dir}"
-    call_curl "kind-linux-${arch}" "https://github.com/kubernetes-sigs/kind/releases/download/${version}/kind-linux-${arch}"
-    call_curl "kind-linux-${arch}.sha256sum" "https://github.com/kubernetes-sigs/kind/releases/download/${version}/kind-linux-${arch}.sha256sum"
-    grep "kind-linux-${arch}" < "kind-linux-${arch}.sha256sum" | sha256sum -c
-    mv "kind-linux-${arch}" kind
-    rm -f "kind-linux-${arch}.sha256sum"
-    chmod +x kind
+    local binary_name="kind-${os}-${arch}"
+
+    call_curl "${binary_name}" "https://github.com/kubernetes-sigs/kind/releases/download/${version}/${binary_name}"
+    call_curl "${binary_name}.sha256sum" "https://github.com/kubernetes-sigs/kind/releases/download/${version}/${binary_name}.sha256sum"
+
+    local expected_sum
+    expected_sum=$(grep "${binary_name}" < "${binary_name}.sha256sum" | awk '{print $1}')
+    verify_sha256 "${binary_name}" "${expected_sum}"
+
+    if [[ "${os}" == "windows" ]]; then
+        mv "${binary_name}" kind.exe
+    else
+        mv "${binary_name}" kind
+        chmod +x kind
+    fi
+
+    rm -f "${binary_name}.sha256sum"
     popd
 }
 
@@ -248,10 +295,23 @@ install_kubectl() {
     mkdir -p "${kubectl_dir}"
 
     pushd "${kubectl_dir}"
-    call_curl kubectl "https://dl.k8s.io/release/${kubectl_version}/bin/linux/${arch}/kubectl"
-    call_curl kubectl.sha256 "https://dl.k8s.io/release/${kubectl_version}/bin/linux/${arch}/kubectl.sha256"
-    echo "$(cat kubectl.sha256) kubectl" | sha256sum -c
-    chmod +x kubectl
+    local kubectl_filename="kubectl"
+    if [[ "${os}" == "windows" ]]; then
+        kubectl_filename="kubectl.exe"
+    fi
+
+    local url="https://dl.k8s.io/release/${kubectl_version}/bin/${os}/${arch}/${kubectl_filename}"
+
+    call_curl "${kubectl_filename}" "${url}"
+    call_curl "${kubectl_filename}.sha256" "${url}.sha256"
+
+    local expected_sum
+    expected_sum=$(awk '{print $1}' "${kubectl_filename}.sha256")
+    verify_sha256 "${kubectl_filename}" "${expected_sum}"
+
+    if [[ "${os}" != "windows" ]]; then
+        chmod +x kubectl
+    fi
     popd
 }
 
@@ -290,6 +350,18 @@ install_cloud_provider(){
 
 create_kind_cluster() {
     echo 'Creating kind cluster...'
+
+    if [[ "${os}" != "linux" ]]; then
+        if [[ "${with_registry}" == true ]]; then
+            echo "ERROR: 'registry' is only supported on Linux." >&2
+            exit 1
+        fi
+        if [[ "${cloud_provider}" == true ]]; then
+            echo "ERROR: 'cloud_provider' is only supported on Linux." >&2
+            exit 1
+        fi
+    fi
+
     local args=(create cluster "--name=${cluster_name}" "--wait=${wait}")
 
     if [[ -n "${node_image}" ]]; then
@@ -321,7 +393,7 @@ create_kind_cluster() {
         install_cloud_provider
     fi
 
-    "${kind_dir}/kind" "${args[@]}"
+    "${kind_dir}/kind${binary_ext}" "${args[@]}"
 }
 
 main "$@"
