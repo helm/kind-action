@@ -455,9 +455,8 @@ jobs:
         uses: ./
         with:
           install_only: true
-          # kind stopped publishing Windows binaries from v0.33.0 onwards,
-          # so pin to the last release that ships a Windows binary.
-          version: v0.32.0
+          # No version set on purpose: this exercises the documented default
+          # path (v0.33.0) on Windows.
 
       - name: Verify kind and kubectl are installed
         shell: bash
