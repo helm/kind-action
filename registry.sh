@@ -38,6 +38,11 @@ EOF
 }
 
 main() {
+    case "$(uname -s)" in
+        Linux) ;;
+        *) echo "ERROR: 'registry' is only supported on Linux." >&2; exit 1 ;;
+    esac
+
     local registry_name="$DEFAULT_REGISTRY_NAME"
     local registry_image="$DEFAULT_REGISTRY_IMAGE"
     local registry_port="$DEFAULT_REGISTRY_PORT"

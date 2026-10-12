@@ -11,6 +11,14 @@ A GitHub Action for Kubernetes IN Docker - local clusters for testing Kubernetes
 Create a workflow YAML file in your `.github/workflows` directory. An [example workflow](#example-workflow) is available below.
 For more information, reference the GitHub Help Documentation for [Creating a workflow file](https://help.github.com/en/articles/configuring-a-workflow#creating-a-workflow-file).
 
+### Supported Operating Systems
+
+The action can install `kind` and `kubectl` on Linux, macOS, and Windows runners.
+
+- **Cluster creation requires Docker.** `kind` creates Kubernetes clusters using Docker containers with Linux node images, so a cluster can only be created where Docker (with Linux container support) is available. GitHub-hosted `ubuntu-latest` runners satisfy this.
+- **Hosted macOS and Windows runners do not provide Docker for Linux containers.** On these runners use `install_only: true` to install the `kind` and `kubectl` binaries without creating a cluster (the binaries are still added to `PATH`).
+- **`registry` and `cloud_provider` are Linux-only.** Enabling either on a non-Linux runner fails with a clear error, since they rely on Linux-specific tools and paths (`sudo`, `/etc/hosts`, `/usr/local/bin`, Docker networking).
+
 ### Inputs
 
 For more information on inputs, see the [API Documentation](https://developer.github.com/v3/repos/releases/#input)

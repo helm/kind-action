@@ -25,16 +25,24 @@ main() {
     args=(--name "${INPUT_CLUSTER_NAME:-$DEFAULT_CLUSTER_NAME}")
     registry_args=("${INPUT_REGISTRY_NAME:-$DEFAULT_REGISTRY_NAME}")
 
-    if [[ "${INPUT_CLOUD_PROVIDER:-false}" == true ]]; then
+    if [[ "${INPUT_CLOUD_PROVIDER:-false}" == true ]] && [[ "$(uname -s)" == "Linux" ]]; then
         rm -f /usr/local/bin/cloud-provider-kind || true
         rm -rf cloud-provider-kind || true
         rm -f /tmp/cloud-provider.log || true
         rm -f cloud-provider-kind_*_checksums.txt || true
     fi
 
-    docker rm -f "${registry_args[@]}" || "${INPUT_IGNORE_FAILED_CLEAN}"
+    # The registry container is only ever created on Linux (registry.sh is
+    # Linux-only), so only attempt to remove it there.
+    if [[ "$(uname -s)" == "Linux" ]]; then
+        docker rm -f "${registry_args[@]}" || "${INPUT_IGNORE_FAILED_CLEAN}"
+    fi
 
-    kind delete cluster "${args[@]}" || "${INPUT_IGNORE_FAILED_CLEAN}"
+    # Deleting the cluster requires both binaries; hosted macOS/Windows runners
+    # may not have Docker at all, in which case there is nothing to clean up.
+    if command -v kind > /dev/null 2>&1 && command -v docker > /dev/null 2>&1; then
+        kind delete cluster "${args[@]}" || "${INPUT_IGNORE_FAILED_CLEAN}"
+    fi
 }
 
 main
