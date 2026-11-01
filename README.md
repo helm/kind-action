@@ -131,7 +131,7 @@ jobs:
           registry_enable_delete: true
 ```
 
-This will configure the cluster with an insecure local registry at `my-registry:5001` on both the host and within cluster. Subsequent steps can refer to the registry address with the output of the kind setup step (i.e. `${{ steps.kind.outputs.LOCAL_REGISTRY }}`).
+This configures the cluster to use an insecure local registry at `my-registry:5001` and exposes it on the runner host at port `5001`. Use `localhost:5001` for Docker commands on the runner host, and the `LOCAL_REGISTRY` output (i.e. `${{ steps.kind.outputs.LOCAL_REGISTRY }}`) for image references used by workloads inside the cluster.
 
 **Note**: If `config` option is used, you must manually configure the cluster nodes with registry config dir enabled at `/etc/containerd/certs.d`. For example:
 

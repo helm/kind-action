@@ -334,6 +334,7 @@ jobs:
         - name: Test
           env:
             LOCAL_REGISTRY: ${{ steps.kind.outputs.LOCAL_REGISTRY }}
+            LOCAL_REGISTRY_HOST: localhost:5001
           run: |
             kubectl cluster-info
             kubectl get storageclass standard
@@ -344,8 +345,8 @@ jobs:
             fi
 
             docker pull busybox
-            docker tag busybox $LOCAL_REGISTRY/localbusybox
-            docker push $LOCAL_REGISTRY/localbusybox
+            docker tag busybox $LOCAL_REGISTRY_HOST/localbusybox
+            docker push $LOCAL_REGISTRY_HOST/localbusybox
 
             kubectl create job test --image=$LOCAL_REGISTRY/localbusybox
             kubectl wait --for=condition=complete --timeout=30s job/test
@@ -374,6 +375,7 @@ jobs:
         - name: Test
           env:
             LOCAL_REGISTRY: ${{ steps.kind.outputs.LOCAL_REGISTRY }}
+            LOCAL_REGISTRY_HOST: localhost:5001
           run: |
             kubectl cluster-info
             kubectl get storageclass standard
@@ -384,12 +386,19 @@ jobs:
             fi
 
             docker pull busybox
-            docker tag busybox $LOCAL_REGISTRY/localbusybox
+            docker tag busybox $LOCAL_REGISTRY_HOST/localbusybox
 
-            DIGEST=$(docker push $LOCAL_REGISTRY/localbusybox | grep -oE 'sha256:\w+')
+            PUSH_OUTPUT=$(docker push "$LOCAL_REGISTRY_HOST/localbusybox" 2>&1)
+            printf '%s\n' "$PUSH_OUTPUT"
+            DIGEST=$(printf '%s\n' "$PUSH_OUTPUT" |
+              sed -nE 's/.*latest: digest: (sha256:[[:xdigit:]]+).*/\1/p')
+            if [[ -z "${DIGEST}" ]]; then
+              echo "Registry did not return the pushed manifest digest" >&2
+              exit 1
+            fi
 
-            curl -X DELETE $LOCAL_REGISTRY/v2/localbusybox/manifests/$DIGEST
-            [[ "$(curl -Ls $LOCAL_REGISTRY/v2/localbusybox/tags/list | jq .tags)" == null ]]
+            curl -X DELETE "http://${LOCAL_REGISTRY_HOST}/v2/localbusybox/manifests/${DIGEST}"
+            [[ "$(curl -Ls "http://${LOCAL_REGISTRY_HOST}/v2/localbusybox/tags/list" | jq .tags)" == null ]]
 
   test-with-cloud-provider-enabled:
       runs-on: ubuntu-latest
