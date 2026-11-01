@@ -45,11 +45,11 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: your-image-with-docker-access
-    env:
-      KIND_EXPERIMENTAL_DOCKER_NETWORK: ${{ job.container.network }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: helm/kind-action@v1.15.1
+        env:
+          KIND_EXPERIMENTAL_DOCKER_NETWORK: ${{ job.container.network }}
         with:
           cluster_name: kind
           config: ./kind-config.yaml
@@ -64,7 +64,8 @@ runner's Docker daemon. If the runner does not expose that network name, set
 `KIND_EXPERIMENTAL_DOCKER_NETWORK` to the network name available to the job
 container instead. The `kubectl config set-cluster` command assumes the
 `cluster_name` is `kind`; for another name, use the corresponding `kind-<name>`
-context and node container name.
+context and node container name. The CI workflow exercises this setup in the
+`test-with-job-container` job.
 
 ### Inputs
 

@@ -29,6 +29,48 @@ jobs:
           kubectl cluster-info
           kubectl get storageclass standard
 
+  test-with-job-container:
+    runs-on: ubuntu-latest
+    container:
+      image: ubuntu:24.04
+      options: --volume /var/run/docker.sock:/var/run/docker.sock
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Install Docker CLI
+        run: |
+          apt-get update
+          apt-get install --no-install-recommends -y ca-certificates curl docker.io git
+
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Verify Docker access and job network
+        env:
+          KIND_EXPERIMENTAL_DOCKER_NETWORK: ${{ job.container.network }}
+        run: |
+          test -S /var/run/docker.sock
+          test -n "$KIND_EXPERIMENTAL_DOCKER_NETWORK"
+          docker info
+
+      - name: Create kind cluster in the job container
+        uses: ./
+        env:
+          KIND_EXPERIMENTAL_DOCKER_NETWORK: ${{ job.container.network }}
+        with:
+          cluster_name: kind
+          config: ./.github/workflows/kind-job-container-config.yaml
+
+      - name: Verify cluster access from the job container
+        run: |
+          kubectl config set-cluster kind-kind --server=https://kind-control-plane:6443
+          kubectl cluster-info
+          kubectl get nodes
+
   test-with-custom-wait:
     runs-on: ubuntu-latest
 
