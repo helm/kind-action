@@ -232,7 +232,7 @@ parse_command_line() {
 }
 
 call_curl() {
-    if curl -sSL --retry 5 --retry-all-errors --retry-delay 5 -o "$1" "$2"; then
+    if curl -fsSL --retry 5 --retry-all-errors --retry-delay 5 -o "$1" "$2"; then
         :
     else
         error="$?"
@@ -243,6 +243,11 @@ call_curl() {
 verify_sha256() {
     local file="$1"
     local expected="$2"
+
+    if [[ ! "${expected}" =~ ^[[:xdigit:]]{64}$ ]]; then
+        echo "Error: no valid SHA-256 checksum found for ${file}" >&2
+        exit 1
+    fi
 
     local sum_cmd
     if command -v sha256sum &> /dev/null; then
@@ -275,7 +280,7 @@ install_kind() {
     call_curl "${binary_name}.sha256sum" "https://github.com/kubernetes-sigs/kind/releases/download/${version}/${binary_name}.sha256sum"
 
     local expected_sum
-    expected_sum=$(grep "${binary_name}" < "${binary_name}.sha256sum" | awk '{print $1}')
+    expected_sum=$(awk -v file="${binary_name}" '$2 == file || $2 == ("*" file) { print $1; exit }' "${binary_name}.sha256sum")
     verify_sha256 "${binary_name}" "${expected_sum}"
 
     if [[ "${os}" == "windows" ]]; then
