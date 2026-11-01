@@ -40,7 +40,9 @@ main() {
 
     # Deleting the cluster requires both binaries; hosted macOS/Windows runners
     # may not have Docker at all, in which case there is nothing to clean up.
-    if command -v kind > /dev/null 2>&1 && command -v docker > /dev/null 2>&1; then
+    if [[ "${INPUT_INSTALL_ONLY:-false}" != true ]] &&
+        command -v kind > /dev/null 2>&1 &&
+        command -v docker > /dev/null 2>&1; then
         kind delete cluster "${args[@]}" || "${INPUT_IGNORE_FAILED_CLEAN}"
     fi
 }
