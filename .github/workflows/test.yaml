@@ -63,7 +63,7 @@ jobs:
           KIND_EXPERIMENTAL_DOCKER_NETWORK: ${{ job.container.network }}
         with:
           cluster_name: kind
-          config: ./.github/kind-job-container-config.yaml
+          config: ./testdata/kind-job-container-config.yaml
 
       - name: Verify cluster access from the job container
         run: |
