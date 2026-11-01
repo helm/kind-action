@@ -388,7 +388,15 @@ jobs:
             docker pull busybox
             docker tag busybox $LOCAL_REGISTRY_HOST/localbusybox
 
-            DIGEST=$(docker push $LOCAL_REGISTRY_HOST/localbusybox | grep -oE 'sha256:\w+')
+            docker push $LOCAL_REGISTRY_HOST/localbusybox
+            DIGEST=$(curl -fsSI \
+              -H 'Accept: application/vnd.docker.distribution.manifest.v2+json' \
+              "http://${LOCAL_REGISTRY_HOST}/v2/localbusybox/manifests/latest" |
+              awk 'tolower($1) == "docker-content-digest:" { gsub(/\r/, "", $2); print $2 }')
+            if [[ -z "${DIGEST}" ]]; then
+              echo "Registry did not return the pushed manifest digest" >&2
+              exit 1
+            fi
 
             curl -X DELETE "http://${LOCAL_REGISTRY_HOST}/v2/localbusybox/manifests/${DIGEST}"
             [[ "$(curl -Ls "http://${LOCAL_REGISTRY_HOST}/v2/localbusybox/tags/list" | jq .tags)" == null ]]
