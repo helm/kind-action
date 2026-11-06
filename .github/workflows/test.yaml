@@ -443,7 +443,11 @@ jobs:
             [[ "$(curl -Ls "http://${LOCAL_REGISTRY_HOST}/v2/localbusybox/tags/list" | jq .tags)" == null ]]
 
   test-with-cloud-provider-enabled:
-      runs-on: ubuntu-latest
+      strategy:
+        matrix:
+          runner: [ubuntu-latest, ubuntu-24.04-arm]
+
+      runs-on: ${{ matrix.runner }}
 
       permissions:
         contents: read
@@ -465,6 +469,18 @@ jobs:
               echo "Cloud provider is present."
             else
               echo "Cloud provider is not present."
+              exit 1
+            fi
+
+            case "$(uname -m)" in
+              x86_64) expected_arch="x86-64" ;;
+              aarch64) expected_arch="ARM aarch64" ;;
+            esac
+            if file -L /usr/local/bin/cloud-provider-kind | grep -q "${expected_arch}"; then
+              echo "Cloud provider binary matches the runner architecture."
+            else
+              file -L /usr/local/bin/cloud-provider-kind
+              echo "Cloud provider binary does not match the runner architecture."
               exit 1
             fi
 
